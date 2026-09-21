@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.aifitness.coach',
-  appName: 'دستیار هوشمند بدنسازی',
+  appName: 'AI Fitness Coach',
   webDir: 'dist',
   server: {
     androidScheme: 'https'
@@ -10,17 +10,24 @@ const config: CapacitorConfig = {
   android: {
     allowMixedContent: false,
     captureInput: true,
-    webContentsDebuggingEnabled: false
+    webContentsDebuggingEnabled: false,
+    backgroundColor: '#0D0D1A'
   },
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,
-      backgroundColor: '#0d0d1a',
+      backgroundColor: '#0D0D1A',
       showSpinner: false,
+      androidSplashResourceName: 'splash',
+      androidScaleType: 'CENTER_CROP',
     },
     StatusBar: {
       style: 'DARK',
-      backgroundColor: '#1a1a2e',
+      backgroundColor: '#1A1A2E',
+    },
+    Keyboard: {
+      resize: 'body',
+      resizeOnFullScreen: true,
     }
   }
 };

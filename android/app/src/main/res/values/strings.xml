@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">دستیار هوشمند بدنسازی</string>
-    <string name="title_activity_main">AI Fitness Coach</string>
-    <string name="package_name">com.aifitness.coach</string>
-    <string name="custom_url_scheme">com.aifitness.coach</string>
-</resources>

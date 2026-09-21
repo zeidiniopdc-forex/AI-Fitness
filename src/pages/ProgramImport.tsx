@@ -7,7 +7,7 @@ import { Import as ImportIcon, Check, AlertCircle, Trash2, Save, Eye } from 'luc
 import { toPersianNumber } from '../utils/jalali';
 
 export default function ProgramImport() {
-  const { state, addProgram, removeProgram, setActiveProgram } = useAppContext();
+  const { state, activeProfile, addProgram, removeProgram, setActiveProgram } = useAppContext();
   const [jsonInput, setJsonInput] = useState('');
   const [validationResult, setValidationResult] = useState<{ valid: boolean; data?: any; error?: string } | null>(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -26,6 +26,7 @@ export default function ProgramImport() {
     
     const program: WorkoutProgram = {
       id: uuidv4(),
+      profileId: activeProfile!.id,
       name: validationResult.data.program_name,
       duration: validationResult.data.duration,
       createdAt: new Date().toISOString(),

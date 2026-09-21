@@ -13,8 +13,8 @@ export interface AthleteProfile {
   injuries: string[];
   limitations: string[];
   avoidedExercises: string[];
-  primaryGoal: Goal;
-  secondaryGoal?: Goal;
+  primaryGoal: string;
+  secondaryGoal?: string;
   targetMuscles: string[];
   timeline: string;
   trainingHistory: string;
@@ -45,6 +45,7 @@ export interface BodyMeasurements {
 
 export interface WorkoutProgram {
   id: string;
+  profileId: string;
   name: string;
   duration: string;
   createdAt: string;
@@ -70,6 +71,7 @@ export interface Exercise {
 
 export interface WorkoutSession {
   id: string;
+  profileId: string;
   programId: string;
   dayId: string;
   date: string;
@@ -96,6 +98,7 @@ export interface SetRecord {
 
 export interface ProgressEntry {
   id: string;
+  profileId: string;
   date: string;
   weight: number;
   measurements?: BodyMeasurements;
@@ -103,7 +106,8 @@ export interface ProgressEntry {
 }
 
 export interface AppState {
-  profile: AthleteProfile | null;
+  profiles: AthleteProfile[];
+  activeProfileId: string | null;
   programs: WorkoutProgram[];
   sessions: WorkoutSession[];
   progress: ProgressEntry[];
@@ -118,6 +122,10 @@ export const GOAL_LABELS: Record<Goal, string> = {
   competition: 'آمادگی مسابقه',
   general_fitness: 'آمادگی عمومی',
 };
+
+export function getGoalLabel(goal: string): string {
+  return GOAL_LABELS[goal as Goal] || goal;
+}
 
 export const EXPERIENCE_LABELS: Record<string, string> = {
   beginner: 'مبتدی',

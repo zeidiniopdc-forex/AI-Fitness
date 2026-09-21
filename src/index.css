@@ -2,6 +2,7 @@
 
 @theme {
   --font-vazir: 'Vazirmatn', sans-serif;
+  /* Dark Theme Colors */
   --color-dark-bg: #0d0d1a;
   --color-dark-card: #1a1a2e;
   --color-dark-surface: #16213e;
@@ -9,9 +10,21 @@
   --color-gold-light: #f0d060;
   --color-blue-accent: #4a90d9;
   --color-blue-light: #6bb5ff;
-  --color-success: #22c55e;
-  --color-danger: #ef4444;
-  --color-warning: #f59e0b;
+  /* Light Theme Colors - Green/Teal */
+  --color-mint-50: #f0fdfa;
+  --color-mint-100: #ccfbf1;
+  --color-mint-200: #99f6e4;
+  --color-mint-300: #5eead4;
+  --color-mint-400: #2dd4bf;
+  --color-mint-500: #14b8a6;
+  --color-mint-600: #0d9488;
+  --color-mint-700: #0f766e;
+  --color-teal-50: #f0fdfa;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
 }
 
 * {
@@ -19,36 +32,71 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+/* Dark Theme (Default) */
 body {
-  background-color: #0d0d1a;
+  background-color: #0a0a15;
   color: #e2e8f0;
   direction: rtl;
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Light Theme - Green/Teal */
+[data-theme="light"] body {
+  background-color: #f0fdfa;
+  color: #134e4a;
+}
+
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a2e;
+  background: #0d0d1a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4af37;
-  border-radius: 3px;
+  background: linear-gradient(to bottom, #d4af37, #f0d060);
+  border-radius: 4px;
 }
 
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #ccfbf1;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #14b8a6, #0d9488);
+}
+
+/* Form Inputs */
 input, select, textarea {
   direction: rtl;
   font-family: 'Vazirmatn', sans-serif;
 }
 
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Animations */
 @keyframes pulse-gold {
   0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
-  50% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+  50% { box-shadow: 0 0 0 12px rgba(212, 175, 55, 0); }
 }
 
 .animate-pulse-gold {
@@ -61,5 +109,128 @@ input, select, textarea {
 }
 
 .animate-slide-up {
-  animation: slide-up 0.3s ease-out;
+  animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+@keyframes scale-in {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes progress-fill {
+  from { stroke-dashoffset: 283; }
+}
+
+.animate-progress {
+  animation: progress-fill 1s ease-out;
+}
+
+/* Focus Styles */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #d4af37;
+  outline-offset: 2px;
+}
+
+[data-theme="light"] button:focus-visible,
+[data-theme="light"] a:focus-visible,
+[data-theme="light"] input:focus-visible,
+[data-theme="light"] select:focus-visible,
+[data-theme="light"] textarea:focus-visible {
+  outline-color: #14b8a6;
+}
+
+/* Selection */
+::selection {
+  background: rgba(212, 175, 55, 0.3);
+  color: #fff;
+}
+
+[data-theme="light"] ::selection {
+  background: rgba(20, 184, 166, 0.2);
+  color: #134e4a;
+}
+
+/* Smooth Transitions */
+button, a {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #d4af37 0%, #f0d060 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .gradient-text {
+  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Theme Transition */
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Light theme specific backgrounds */
+[data-theme="light"] .light-gradient-primary {
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #ecfdf5 100%);
+}
+
+[data-theme="light"] .light-gradient-accent {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+}
+
+[data-theme="light"] .light-gradient-soft {
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);
+}
+
+/* Fix Persian typing spacing - CRITICAL */
+input, textarea, select, button {
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+}
+
+/* Ensure space character works properly */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+textarea {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* RTL specific fixes */
+[dir="rtl"] input,
+[dir="rtl"] textarea {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Font rendering optimization */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }

@@ -4,14 +4,14 @@ import { generateAIPrompt } from '../utils/promptGenerator';
 import { Brain, Copy, Check, AlertTriangle, ExternalLink } from 'lucide-react';
 
 export default function PromptGenerator() {
-  const { state } = useAppContext();
+  const { activeProfile } = useAppContext();
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [copied, setCopied] = useState(false);
   const [selectedModel, setSelectedModel] = useState('');
 
   const handleGenerate = () => {
-    if (!state.profile) return;
-    const prompt = generateAIPrompt(state.profile);
+    if (!activeProfile) return;
+    const prompt = generateAIPrompt(activeProfile);
     setGeneratedPrompt(prompt);
   };
 
@@ -30,7 +30,7 @@ export default function PromptGenerator() {
     }
   };
 
-  if (!state.profile) {
+  if (!activeProfile) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <AlertTriangle size={48} className="text-[#f59e0b] mb-4" />
@@ -62,12 +62,12 @@ export default function PromptGenerator() {
       <div className="bg-[#1a1a2e] rounded-2xl p-5 border border-[#d4af37]/10">
         <h3 className="text-[#d4af37] font-bold mb-3">خلاصه اطلاعات ارسالی</h3>
         <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="text-gray-400">نام: <span className="text-white">{state.profile.name}</span></div>
-          <div className="text-gray-400">سن: <span className="text-white">{state.profile.age} سال</span></div>
-          <div className="text-gray-400">وزن: <span className="text-white">{state.profile.weight} کیلو</span></div>
-          <div className="text-gray-400">قد: <span className="text-white">{state.profile.height} سانتی‌متر</span></div>
-          <div className="text-gray-400">هدف: <span className="text-white">{state.profile.primaryGoal}</span></div>
-          <div className="text-gray-400">روزهای تمرین: <span className="text-white">{state.profile.trainingDays} روز</span></div>
+          <div className="text-gray-400">نام: <span className="text-white">{activeProfile.name}</span></div>
+          <div className="text-gray-400">سن: <span className="text-white">{activeProfile.age} سال</span></div>
+          <div className="text-gray-400">وزن: <span className="text-white">{activeProfile.weight} کیلو</span></div>
+          <div className="text-gray-400">قد: <span className="text-white">{activeProfile.height} سانتی‌متر</span></div>
+          <div className="text-gray-400">هدف: <span className="text-white">{activeProfile.primaryGoal}</span></div>
+          <div className="text-gray-400">روزهای تمرین: <span className="text-white">{activeProfile.trainingDays} روز</span></div>
         </div>
       </div>
 

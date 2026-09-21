@@ -1,7 +1,7 @@
-import { AthleteProfile, GOAL_LABELS, EXPERIENCE_LABELS } from '../types';
+import { AthleteProfile, GOAL_LABELS, EXPERIENCE_LABELS, getGoalLabel } from '../types';
 
 export function generateAIPrompt(profile: AthleteProfile): string {
-  const goalLabel = GOAL_LABELS[profile.primaryGoal];
+  const goalLabel = getGoalLabel(profile.primaryGoal);
   const experienceLabel = EXPERIENCE_LABELS[profile.experience];
   
   const prompt = `You are a world-class bodybuilding coach, CSCS specialist, biomechanics expert, and hypertrophy researcher with 20+ years of experience training elite athletes. You have deep knowledge of evidence-based training principles from Brad Schoenfeld, Renaissance Periodization (Mike Israetel), Eric Helms, and ACSM guidelines.
@@ -26,7 +26,7 @@ Design a complete, periodized training program for the following athlete based o
 
 ## Primary Goal
 ${goalLabel}
-${profile.secondaryGoal ? `## Secondary Goal\n${GOAL_LABELS[profile.secondaryGoal]}` : ''}
+${profile.secondaryGoal ? `## Secondary Goal\n${getGoalLabel(profile.secondaryGoal)}` : ''}
 ${profile.targetMuscles.length > 0 ? `## Priority Muscles\n${profile.targetMuscles.join(', ')}` : ''}
 ## Timeline
 ${profile.timeline || 'Standard 8-12 week program'}

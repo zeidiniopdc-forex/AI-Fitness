@@ -1,121 +1,137 @@
-# 🏋️ دستیار هوشمند بدنسازی | AI Fitness Coach
+# 🏋️ AI Fitness Coach | دستیار هوشمند بدنسازی
 
 <div align="center">
 
 ![Version](https://img.shields.io/badge/version-1.0.0-D4AF37?style=for-the-badge)
-![Platform](https://img.shields.io/badge/platform-Android-4A90D9?style=for-the-badge)
-![Build](https://github.com/your-username/ai-fitness-coach/actions/workflows/build-apk.yml/badge.svg)
+![Platform](https://img.shields.io/badge/platform-Android-14B8A6?style=for-the-badge)
+![Min Android](https://img.shields.io/badge/min%20android-7.0-0D9488?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-22C55E?style=for-the-badge)
 
-**دستیار هوشمند بدنسازی با هوش مصنوعی**
+**Professional AI-Powered Bodybuilding Assistant**
 
-*یک اپلیکیشن حرفه‌ای برای مربیان و ورزشکاران بدنسازی*
+*An intelligent app for coaches and athletes*
+
+[📥 Download APK](#-download) • [📖 Documentation](#-documentation) • [🇮🇷 مستندات فارسی](README_FA.md)
 
 </div>
 
 ---
 
-## 📋 فهرست مطالب
+## 📋 Table of Contents
 
-- [معرفی](#-معرفی)
-- [ویژگی‌ها](#-ویژگی‌ها)
-- [تکنولوژی‌ها](#-تکنولوژی‌ها)
-- [نصب و راه‌اندازی](#-نصب-و-راه‌اندازی)
-- [ساخت APK](#-ساخت-apk)
-- [ساختار پروژه](#-ساختار-پروژه)
-- [مشارکت](#-مشارکت)
-
----
-
-## 🎯 معرفی
-
-دستیار هوشمند بدنسازی یک اپلیکیشن حرفه‌ای است که با استفاده از هوش مصنوعی، برنامه‌های تمرینی شخصی‌سازی شده برای ورزشکاران تولید می‌کند. این اپلیکیشن به مربیان و ورزشکاران کمک می‌کند تا:
-
-- 📊 اطلاعات ورزشکار را جمع‌آوری و مدیریت کنند
-- 🧠 پرامپت‌های حرفه‌ای برای مدل‌های هوش مصنوعی تولید کنند
-- 📋 برنامه‌های تمرینی را وارد و مدیریت کنند
-- 🏃 تمرینات روزانه را ردیابی کنند
-- 📈 پیشرفت بلندمدت را تحلیل کنند
-- 📅 تقویم شمسی برای برنامه‌ریزی داشته باشند
+- [Overview](#-overview)
+- [Features](#-features)
+- [Download](#-download)
+- [Installation](#-installation)
+- [Build from Source](#-build-from-source)
+- [Release Process](#-release-process)
+- [Cafe Bazaar](#-cafe-bazaar-publishing)
+- [Tech Stack](#-tech-stack)
 
 ---
 
-## ✨ ویژگی‌ها
+## 🎯 Overview
 
-### 📝 پروفایل ورزشکار
-- اطلاعات پایه (نام، سن، قد، وزن)
-- سطح تجربه و سابقه تمرینی
-- تجهیزات موجود و محل تمرین
-- آسیب‌دیدگی‌ها و محدودیت‌ها
-- اهداف (عضله‌سازی، قدرت، چربی‌سوزی و...)
-- عضلات هدف و زمان‌بندی
+AI Fitness Coach is a professional application that uses artificial intelligence to generate personalized workout programs for athletes. This app helps coaches and athletes:
 
-### 🧠 تولید پرامپت هوش مصنوعی
-- تولید خودکار پرامپت علمی و حرفه‌ای
-- سازگار با ChatGPT، Gemini، Claude
-- بر اساس اصول علمی (Schoenfeld, Helms, Israetel)
-- خروجی JSON ساختاریافته
-
-### 📥 ورود برنامه تمرینی
-- اعتبارسنجی JSON
-- پیش‌نمایش قبل از ذخیره
-- مدیریت چندین برنامه
-- فعال‌سازی برنامه مورد نظر
-
-### 🏋️ ردیاب تمرین
-- اجرای زنده تمرین
-- تایمر استراحت خودکار
-- ثبت وزن و تکرار واقعی
-- امکان رد کردن ست
-- گزارش پایان جلسه
-
-### 📊 داشبورد پیشرفت
-- نمودار روند وزن
-- آمار جلسات و حجم تمرین
-- تحلیل اندازه‌گیری بدن
-- نمودار رادار عضلات
-
-### 📅 تقویم شمسی
-- تقویم جلالی کامل
-- نمایش جلسات تمرینی
-- برنامه هفتگی
+- 📊 Collect and manage athlete information
+- 🧠 Generate professional AI prompts
+- 📋 Import and manage workout programs
+- 🏃 Track daily workouts
+- 📈 Analyze long-term progress
+- 📅 Plan with Persian calendar
 
 ---
 
-## 🛠 تکنولوژی‌ها
+## ✨ Features
 
-### Frontend (Web)
-- **React 18** + **TypeScript**
-- **Vite** - Build tool
-- **Tailwind CSS 4** - Styling
-- **React Router** - Navigation
-- **Recharts** - Charts & Graphs
-- **Lucide React** - Icons
-- **Jalaali JS** - Persian Calendar
-- **Framer Motion** - Animations
+### 🤖 AI Integration
+- **Professional Prompt Generation**: Creates scientific prompts based on athlete data
+- **Compatible with ChatGPT, Gemini, Claude**: JSON output for all AI models
+- **Scientific Principles**: Based on Schoenfeld, Helms, Israetel research
 
-### Android
-- **Capacitor 5** - Native bridge
-- **Kotlin** - Native code
-- **Material Design 3** - UI components
-- **AndroidX** - Support libraries
+### 👥 Multi-Profile Management
+- **Unlimited Profiles**: Separate profile for each athlete
+- **Quick Switch**: Change between profiles with one click
+- **Independent Data**: Each profile has its own programs and stats
 
-### Build & CI/CD
-- **GitHub Actions** - Automated builds
-- **Gradle 8.5** - Android build system
-- **Android SDK 34** - Target platform
+### 🏋️ Professional Workout Tracker
+- **Today's Workout**: Auto-display of daily workout
+- **Rest Timer**: Auto-start after each set
+- **Weight & Rep Logging**: Accurate performance tracking
+- **Cancel Session**: Cancel without saving to history
+- **Live Progress**: Progress bar during workout
+
+### 📊 Professional Dashboard
+- **Complete Stats**: Sessions, volume, streak, weekly goal
+- **Weight Chart**: Weight trend visualization
+- **Last Session**: Complete last workout info
+- **Weekly Progress**: Progress bar with 7-day view
+
+### 📅 Persian Calendar
+- **Jalali Calendar**: Fully Persian
+- **Session Display**: Workout days marked
+- **Weekly Schedule**: View training program
+
+### 📈 Progress & Analytics
+- **Body Measurements**: Weight, waist, arms, etc.
+- **Radar Chart**: Muscle analysis
+- **Complete History**: All measurements
+
+### 🎨 Professional Design
+- **Dark Theme**: Gold and blue
+- **Light Theme**: Green and teal
+- **Full RTL**: Complete Persian support
+- **Vazirmatn Font**: Professional typography
 
 ---
 
-## 📦 نصب و راه‌اندازی
+## 📥 Download
 
-### پیش‌نیازها
+### Latest Release
+Download the latest APK from [GitHub Releases](../../releases/latest)
+
+### All Versions
+All versions are available at [Releases Page](../../releases)
+
+### Build from Source
+See [Build from Source](#-build-from-source) section
+
+---
+
+## 📱 Installation
+
+### Method 1: Direct APK Installation
+1. Download APK file from GitHub
+2. Tap on the APK file
+3. Grant "Install from Unknown Sources" permission
+4. Complete installation
+
+### Method 2: Using ADB
+```bash
+adb install AI-Fitness-Coach-v1.0.0.apk
+```
+
+### Enable Unknown Sources
+**Android 8.0+:**
+- Settings → Apps → Special Access → Install Unknown Apps
+- Select browser or File Manager
+- Enable "Allow from this source"
+
+**Android 7.0:**
+- Settings → Security → Unknown Sources → Enable
+
+---
+
+## 🛠 Build from Source
+
+### Prerequisites
 - Node.js 18+
 - npm 9+
-- Android Studio (برای build محلی)
-- Java JDK 17
+- Android Studio (for local build)
+- Java JDK 21
 
-### مراحل نصب
+### Build Steps
 
 ```bash
 # Clone repository
@@ -125,232 +141,158 @@ cd ai-fitness-coach
 # Install dependencies
 npm install
 
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-```
-
-### ساخت APK محلی
-
-```bash
 # Build web app
 npm run build
 
 # Sync with Capacitor
 npx cap sync android
 
-# Open in Android Studio
-npx cap open android
-
-# Or build directly
+# Build APK
 cd android
 ./gradlew assembleDebug
+
+# APK location:
+# android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-APK خروجی در مسیر زیر قرار می‌گیرد:
-```
-android/app/build/outputs/apk/debug/app-debug.apk
-```
-
----
-
-## 🤖 ساخت APK با GitHub Actions
-
-### ساخت خودکار (بدون نیاز به تنظیمات)
-
-فقط کافیست کد را به ریپازیتوری push کنید. GitHub Actions به صورت خودکار:
-
-1. ✅ وب اپلیکیشن را build می‌کند
-2. ✅ با Capacitor sync می‌کند
-3. ✅ APK debug را می‌سازد
-4. ✅ APK را به عنوان artifact آپلود می‌کند
-
-### دریافت APK
-
-1. به تب **Actions** در ریپازیتوری بروید
-2. آخرین workflow اجرا شده را انتخاب کنید
-3. در بخش **Artifacts**، فایل APK را دانلود کنید
-
-### ساخت Release APK (با امضا)
-
-برای ساخت نسخه release با امضای دیجیتال:
-
-#### ۱. ساخت Keystore
+### Build Release APK
 
 ```bash
-keytool -genkey -v -keystore release-keystore.jks \
+# Generate signing key
+keytool -genkey -v -keystore release-key.jks \
   -keyalg RSA -keysize 2048 -validity 10000 \
   -alias ai-fitness-key
+
+# Build release
+cd android
+./gradlew assembleRelease
 ```
 
-#### ۲. اضافه کردن Secrets به GitHub
+---
 
-به مسیر `Settings → Secrets and variables → Actions` بروید و موارد زیر را اضافه کنید:
+## 🚀 Release Process
 
-| Secret Name | Description |
+### 1. Update Version
+```bash
+# Update version in package.json
+npm version 1.0.1
+```
+
+### 2. Create Tag
+```bash
+git tag v1.0.1
+git push origin v1.0.1
+```
+
+### 3. GitHub Actions
+- GitHub Actions runs automatically
+- Release APK is built
+- GitHub Release is created
+- APK is attached to Release
+
+### 4. Download from Releases
+- Go to Releases tab
+- Download latest version
+
+---
+
+## 📱 Cafe Bazaar Publishing
+
+See [CAFE_BAZAAR.md](CAFE_BAZAAR.md) for complete guide on publishing to Cafe Bazaar.
+
+### Quick Steps
+1. Build signed release APK
+2. Prepare 512x512 icon
+3. Take screenshots
+4. Write Persian description
+5. Upload to Cafe Bazaar developer console
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+- **React 18** + **TypeScript**
+- **Vite** - Build tool
+- **Tailwind CSS 4** - Styling
+- **React Router** - Navigation
+- **Recharts** - Charts
+- **Lucide React** - Icons
+- **Jalaali JS** - Persian Calendar
+
+### Android
+- **Capacitor 5** - Native bridge
+- **Kotlin** - Native code
+- **Material Design 3** - UI
+- **Android SDK 34** - Target
+
+### Build & CI/CD
+- **GitHub Actions** - Automated builds
+- **Gradle 8.13** - Build system
+- **Java 21** - Runtime
+
+---
+
+## 📊 Technical Information
+
+| Item | Value |
 |---|---|
-| `ANDROID_KEYSTORE_BASE64` | محتوای keystore به صورت base64 |
-| `ANDROID_KEYSTORE_PATH` | `app/release-keystore.jks` |
-| `ANDROID_KEYSTORE_PASSWORD` | رمز keystore |
-| `ANDROID_KEY_ALIAS` | `ai-fitness-key` |
-| `ANDROID_KEY_PASSWORD` | رمز key |
-
-#### ۳. تبدیل Keystore به Base64
-
-```bash
-base64 -i release-keystore.jks -o keystore-base64.txt
-```
-
-محتوای فایل `keystore-base64.txt` را در secret مربوطه وارد کنید.
-
-#### ۴. ساخت Release
-
-```bash
-# Create a new tag
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-GitHub Actions به صورت خودکار:
-- Release APK signed می‌سازد
-- GitHub Release ایجاد می‌کند
-- APK را به Release اضافه می‌کند
-
-### ساخت دستی با workflow_dispatch
-
-1. به تب **Actions** بروید
-2. **Build Android APK** را انتخاب کنید
-3. **Run workflow** را بزنید
-4. نوع build (debug/release) را انتخاب کنید
+| Min Android | 7.0 (API 24) |
+| Target Android | 14 (API 34) |
+| APK Size | ~15 MB |
+| Architecture | Universal |
+| Language | Persian (RTL) |
+| Font | Vazirmatn |
 
 ---
 
-## 📁 ساختار پروژه
+## 🎨 Design
 
+### Dark Theme
 ```
-ai-fitness-coach/
-├── .github/
-│   └── workflows/
-│       └── build-apk.yml      # GitHub Actions workflow
-├── android/                     # Android project
-│   ├── app/
-│   │   ├── build.gradle        # App-level build config
-│   │   ├── proguard-rules.pro  # ProGuard rules
-│   │   └── src/main/
-│   │       ├── AndroidManifest.xml
-│   │       ├── java/com/aifitness/coach/
-│   │       │   ├── MainActivity.kt
-│   │       │   └── NotificationPlugin.kt
-│   │       └── res/
-│   │           ├── mipmap-anydpi-v26/
-│   │           ├── values/
-│   │           └── xml/
-│   ├── build.gradle            # Root build config
-│   ├── gradle/
-│   │   └── wrapper/
-│   ├── gradlew                 # Gradle wrapper (Unix)
-│   ├── gradlew.bat            # Gradle wrapper (Windows)
-│   ├── gradle.properties
-│   └── settings.gradle
-├── public/
-│   └── vite.svg               # App icon
-├── src/
-│   ├── components/
-│   │   └── Layout.tsx         # Main layout with navigation
-│   ├── context/
-│   │   └── AppContext.tsx     # Global state management
-│   ├── pages/
-│   │   ├── Dashboard.tsx      # Main dashboard
-│   │   ├── Profile.tsx        # Athlete profile
-│   │   ├── PromptGenerator.tsx # AI prompt generator
-│   │   ├── ProgramImport.tsx  # JSON import
-│   │   ├── WorkoutTracker.tsx # Workout execution
-│   │   ├── Calendar.tsx       # Persian calendar
-│   │   └── Progress.tsx       # Progress tracking
-│   ├── types/
-│   │   └── index.ts          # TypeScript types
-│   ├── utils/
-│   │   ├── jalali.ts         # Persian calendar utils
-│   │   ├── promptGenerator.ts # AI prompt engine
-│   │   └── storage.ts        # LocalStorage utils
-│   ├── App.tsx               # Main app component
-│   ├── index.css             # Global styles
-│   └── main.tsx              # Entry point
-├── capacitor.config.ts        # Capacitor configuration
-├── index.html                 # HTML template
-├── package.json               # Dependencies
-├── tsconfig.json              # TypeScript config
-└── vite.config.js             # Vite configuration
+Background: #0A0A15 → #0D0D1A
+Card: #1A1A2E → #16213E
+Accent: #D4AF37 (Gold)
+Secondary: #4A90D9 (Blue)
+Success: #22C55E (Green)
+```
+
+### Light Theme
+```
+Background: #F0FDFA → #FFFFFF → #ECFDF5
+Card: #FFFFFF → #F0FDFA
+Accent: #14B8A6 (Teal)
+Secondary: #0D9488 (Dark Teal)
+Text: #134E4A (Dark Green)
 ```
 
 ---
 
-## 🧪 تست‌ها
+## 🤝 Contributing
 
-### چک‌لیست تست
+Contributions are welcome!
 
-- [ ] ✅ نصب اپلیکیشن روی دستگاه
-- [ ] ✅ نمایش صحیح RTL
-- [ ] ✅ فونت Vazirmatn
-- [ ] ✅ تقویم شمسی
-- [ ] ✅ اعداد فارسی
-- [ ] ✅ ثبت پروفایل
-- [ ] ✅ تولید پرامپت
-- [ ] ✅ ورود JSON
-- [ ] ✅ اجرای تمرین
-- [ ] ✅ تایمر استراحت
-- [ ] ✅ ثبت پیشرفت
-- [ ] ✅ نمودارها
-- [ ] ✅ ذخیره‌سازی محلی
+### How to Contribute
+1. Fork the repository
+2. Create new branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
+
+### Report Issues
+- Use [Issues](../../issues)
+- Write detailed description
+- Add screenshots
 
 ---
 
-## 🎨 طراحی
+## 📄 License
 
-### تم رنگی
-| رنگ | کد | کاربرد |
-|---|---|---|
-| پس‌زمینه | `#0D0D1A` | پس‌زمینه اصلی |
-| کارت | `#1A1A2E` | کارت‌ها و پنل‌ها |
-| طلا | `#D4AF37` | عناوین و دکمه‌ها |
-| آبی | `#4A90D9` | لینک‌ها و highlights |
-| سبز | `#22C55E` | موفقیت و تکمیل |
-
-### فونت
-- **Vazirmatn** - فونت اصلی فارسی
-- وزن‌های: 100 تا 900
+This project is licensed under the MIT License.
 
 ---
 
-## 📱 اسکرین‌شات‌ها
-
-| داشبورد | پروفایل | تمرین |
-|---|---|---|
-| داشبورد اصلی | پروفایل ورزشکار | ردیاب تمرین |
-
----
-
-## 🤝 مشارکت
-
-مشارکت شما باعث خوشحالی ماست! لطفاً مراحل زیر را دنبال کنید:
-
-1. Fork کنید
-2. Branch جدید بسازید (`git checkout -b feature/amazing-feature`)
-3. Commit کنید (`git commit -m 'Add amazing feature'`)
-4. Push کنید (`git push origin feature/amazing-feature`)
-5. Pull Request باز کنید
-
----
-
-## 📄 لایسنس
-
-این پروژه تحت لایسنس MIT منتشر شده است.
-
----
-
-## 📞 ارتباط
+## 📞 Contact
 
 - 📧 Email: info@aifitness-coach.com
 - 🌐 Website: aifitness-coach.com
@@ -358,10 +300,21 @@ ai-fitness-coach/
 
 ---
 
+## 🙏 Acknowledgments
+
+- **Vazirmatn Font** - Saber Rastikerdar
+- **Lucide Icons** - Lucide Contributors
+- **Capacitor** - Ionic Team
+- **React** - Meta
+
+---
+
 <div align="center">
 
-**ساخته شده با ❤️ برای جامعه بدنسازی ایران**
+**Made with ❤️ for the Iranian bodybuilding community**
 
-⭐ اگر این پروژه برایتان مفید بود، ستاره بدهید!
+⭐ If this project is useful to you, give it a star!
+
+[⬆ Back to Top](#-ai-fitness-coach---)
 
 </div>

@@ -1,0 +1,34 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Gold Dumbbell Icon -->
+    <!-- Bar -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M24,50 L84,50 L84,58 L24,58 Z"/>
+    
+    <!-- Left weight plates -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M18,40 L28,40 L28,68 L18,68 Z"/>
+    <path
+        android:fillColor="#F0D060"
+        android:pathData="M12,44 L20,44 L20,64 L12,64 Z"/>
+    
+    <!-- Right weight plates -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M80,40 L90,40 L90,68 L80,68 Z"/>
+    <path
+        android:fillColor="#F0D060"
+        android:pathData="M88,44 L96,44 L96,64 L88,64 Z"/>
+    
+    <!-- AI Text -->
+    <path
+        android:fillColor="#D4AF37"
+        android:pathData="M42,74 L48,74 L54,74 L54,78 L42,78 Z"
+        android:strokeWidth="0"/>
+</vector>

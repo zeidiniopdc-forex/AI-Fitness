@@ -4,14 +4,21 @@ const config: CapacitorConfig = {
   appId: 'com.aifitness.coach',
   appName: 'AI Fitness Coach',
   webDir: 'dist',
+  bundledWebRuntime: false,
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    cleartext: false,
   },
   android: {
     allowMixedContent: false,
     captureInput: true,
     webContentsDebuggingEnabled: false,
-    backgroundColor: '#0D0D1A'
+    backgroundColor: '#0D0D1A',
+    overrideUserAgent: 'AI-Fitness-Coach-Android',
+  },
+  ios: {
+    backgroundColor: '#0D0D1A',
+    scrollEnabled: true,
   },
   plugins: {
     SplashScreen: {
@@ -24,12 +31,17 @@ const config: CapacitorConfig = {
     StatusBar: {
       style: 'DARK',
       backgroundColor: '#1A1A2E',
+      overlaysWebView: true,
     },
     Keyboard: {
       resize: 'body',
       resizeOnFullScreen: true,
-    }
-  }
+    },
+    LocalNotifications: {
+      smallIcon: 'ic_stat_icon_config_sample',
+      iconColor: '#D4AF37',
+    },
+  },
 };
 
 export default config;

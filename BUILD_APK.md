@@ -54,7 +54,7 @@ git push origin v1.0.0
 # نصب Android Studio
 # https://developer.android.com/studio
 
-# نصب Java JDK 17
+# نصب Java JDK 21 (LTS)
 # https://adoptium.net/
 
 # تنظیم environment variables
@@ -62,6 +62,8 @@ export ANDROID_HOME=$HOME/Android/Sdk
 export PATH=$PATH:$ANDROID_HOME/tools/bin
 export PATH=$PATH:$ANDROID_HOME/platform-tools
 ```
+
+**نکته:** GitHub Actions از Java 21 و Gradle 8.13 استفاده می‌کند.
 
 ### مراحل ساخت:
 

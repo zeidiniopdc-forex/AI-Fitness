@@ -38,13 +38,13 @@ export default function CalendarPage() {
     setCurrentMonth(today.month);
   };
 
-  // Get sessions for current month (simplified)
+  // Get completed sessions for current month (simplified)
 
   const getSessionsForDay = (day: number) => {
     return state.sessions.filter(s => {
       const d = new Date(s.date);
-      // Simple check - in production would use proper Jalali conversion
-      return d.getDate() === day;
+      // Only show completed sessions
+      return d.getDate() === day && s.completed;
     });
   };
 
@@ -121,11 +121,11 @@ export default function CalendarPage() {
       {/* Upcoming Sessions */}
       <div className="bg-[#1a1a2e] rounded-2xl p-5 border border-[#d4af37]/10">
         <h3 className="text-[#d4af37] font-bold mb-4">جلسات اخیر</h3>
-        {state.sessions.length === 0 ? (
-          <p className="text-gray-500 text-sm text-center py-4">هنوز جلسه‌ای ثبت نشده</p>
+        {state.sessions.filter(s => s.completed).length === 0 ? (
+          <p className="text-gray-500 text-sm text-center py-4">هنوز جلسه تکمیل شده‌ای ثبت نشده</p>
         ) : (
           <div className="space-y-3">
-            {state.sessions.slice(-5).reverse().map(session => (
+            {state.sessions.filter(s => s.completed).slice(-5).reverse().map(session => (
               <div key={session.id} className="flex items-center justify-between bg-[#0d0d1a] rounded-xl p-3">
                 <div className="flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${

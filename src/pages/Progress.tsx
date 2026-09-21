@@ -7,7 +7,7 @@ import { toPersianNumber, formatDateJalali } from '../utils/jalali';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 
 export default function Progress() {
-  const { state, addProgress } = useAppContext();
+  const { state, activeProfile, addProgress } = useAppContext();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({
     weight: 0,
@@ -18,6 +18,7 @@ export default function Progress() {
   const handleSave = () => {
     const entry: ProgressEntry = {
       id: uuidv4(),
+      profileId: activeProfile!.id,
       date: new Date().toISOString(),
       weight: form.weight,
       measurements: {
@@ -56,10 +57,11 @@ export default function Progress() {
     { subject: 'شانه', value: latestMeasurements.shoulders || 0 },
   ] : [];
 
-  // Calculate stats
-  const totalSessions = state.sessions.filter(s => s.completed).length;
-  const avgVolume = state.sessions.length > 0 
-    ? Math.round(state.sessions.reduce((acc, s) => acc + s.totalVolume, 0) / state.sessions.length)
+  // Calculate stats (only completed sessions)
+  const completedSessions = state.sessions.filter(s => s.completed);
+  const totalSessions = completedSessions.length;
+  const avgVolume = completedSessions.length > 0 
+    ? Math.round(completedSessions.reduce((acc, s) => acc + s.totalVolume, 0) / completedSessions.length)
     : 0;
   const weightChange = state.progress.length >= 2 
     ? state.progress[state.progress.length - 1].weight - state.progress[0].weight

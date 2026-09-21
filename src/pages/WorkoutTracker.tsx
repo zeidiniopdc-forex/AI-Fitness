@@ -7,7 +7,7 @@ import { Dumbbell, Timer, Check, SkipForward, Trophy, X, AlertTriangle, Play } f
 import { toPersianNumber } from '../utils/jalali';
 
 export default function WorkoutTracker() {
-  const { state, addSession, updateSession } = useAppContext();
+  const { state, activeProfile, addSession, updateSession } = useAppContext();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const activeProgram = state.programs.find(p => p.id === state.activeProgram);
@@ -66,6 +66,7 @@ export default function WorkoutTracker() {
     
     const newSession: WorkoutSession = {
       id: uuidv4(),
+      profileId: activeProfile!.id,
       programId: activeProgram!.id,
       dayId: selectedDay.id,
       date: new Date().toISOString(),
@@ -117,14 +118,7 @@ export default function WorkoutTracker() {
   };
 
   const confirmCancel = () => {
-    if (!session) return;
-    const cancelledSession: WorkoutSession = {
-      ...session,
-      completed: false,
-      endTime: new Date().toISOString(),
-      notes: '❌ جلسه لغو شد',
-    };
-    addSession(cancelledSession);
+    // لغو جلسه: هیچ چیزی ذخیره نمی‌شود
     setWorkoutStarted(false);
     setSession(null);
     setShowCancelModal(false);

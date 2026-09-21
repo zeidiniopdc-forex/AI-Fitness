@@ -2,22 +2,53 @@ import { AppState, AthleteProfile, WorkoutProgram, WorkoutSession, ProgressEntry
 
 const STORAGE_KEY = 'ai_fitness_coach_data';
 
-export function loadState(): AppState {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (data) {
-      return JSON.parse(data);
-    }
-  } catch (e) {
-    console.error('Error loading state:', e);
-  }
+function getInitialState(): AppState {
   return {
-    profile: null,
+    profiles: [],
+    activeProfileId: null,
     programs: [],
     sessions: [],
     progress: [],
     activeProgram: null,
   };
+}
+
+// Migration: convert old single-profile format to new multi-profile format
+function migrateState(data: any): AppState {
+  // Old format had `profile` (single) instead of `profiles` (array)
+  if (data.profile && !data.profiles) {
+    return {
+      profiles: [data.profile],
+      activeProfileId: data.profile.id,
+      programs: (data.programs || []).map((p: any) => ({
+        ...p,
+        profileId: data.profile.id,
+      })),
+      sessions: (data.sessions || []).map((s: any) => ({
+        ...s,
+        profileId: data.profile.id,
+      })),
+      progress: (data.progress || []).map((p: any) => ({
+        ...p,
+        profileId: data.profile.id,
+      })),
+      activeProgram: data.activeProgram || null,
+    };
+  }
+  return { ...data, activeProgram: data.activeProgram || null };
+}
+
+export function loadState(): AppState {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) {
+      const parsed = JSON.parse(data);
+      return migrateState(parsed);
+    }
+  } catch (e) {
+    console.error('Error loading state:', e);
+  }
+  return getInitialState();
 }
 
 export function saveState(state: AppState): void {
@@ -30,7 +61,27 @@ export function saveState(state: AppState): void {
 
 export function saveProfile(profile: AthleteProfile): void {
   const state = loadState();
-  state.profile = profile;
+  const existingIndex = state.profiles.findIndex(p => p.id === profile.id);
+  if (existingIndex >= 0) {
+    state.profiles[existingIndex] = profile;
+  } else {
+    state.profiles.push(profile);
+  }
+  if (!state.activeProfileId) {
+    state.activeProfileId = profile.id;
+  }
+  saveState(state);
+}
+
+export function deleteProfile(profileId: string): void {
+  const state = loadState();
+  state.profiles = state.profiles.filter(p => p.id !== profileId);
+  state.programs = state.programs.filter(p => p.profileId !== profileId);
+  state.sessions = state.sessions.filter(s => s.profileId !== profileId);
+  state.progress = state.progress.filter(p => p.profileId !== profileId);
+  if (state.activeProfileId === profileId) {
+    state.activeProfileId = state.profiles.length > 0 ? state.profiles[0].id : null;
+  }
   saveState(state);
 }
 
@@ -48,9 +99,6 @@ export function saveProgram(program: WorkoutProgram): void {
 export function deleteProgram(programId: string): void {
   const state = loadState();
   state.programs = state.programs.filter(p => p.id !== programId);
-  if (state.activeProgram === programId) {
-    state.activeProgram = null;
-  }
   saveState(state);
 }
 
@@ -71,8 +119,8 @@ export function saveProgress(entry: ProgressEntry): void {
   saveState(state);
 }
 
-export function setActiveProgram(programId: string | null): void {
+export function setActiveProfile(profileId: string | null): void {
   const state = loadState();
-  state.activeProgram = programId;
+  state.activeProfileId = profileId;
   saveState(state);
 }

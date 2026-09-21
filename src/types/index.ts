@@ -45,6 +45,7 @@ export interface BodyMeasurements {
 
 export interface WorkoutProgram {
   id: string;
+  profileId: string;
   name: string;
   duration: string;
   createdAt: string;
@@ -70,6 +71,7 @@ export interface Exercise {
 
 export interface WorkoutSession {
   id: string;
+  profileId: string;
   programId: string;
   dayId: string;
   date: string;
@@ -96,6 +98,7 @@ export interface SetRecord {
 
 export interface ProgressEntry {
   id: string;
+  profileId: string;
   date: string;
   weight: number;
   measurements?: BodyMeasurements;
@@ -103,7 +106,8 @@ export interface ProgressEntry {
 }
 
 export interface AppState {
-  profile: AthleteProfile | null;
+  profiles: AthleteProfile[];
+  activeProfileId: string | null;
   programs: WorkoutProgram[];
   sessions: WorkoutSession[];
   progress: ProgressEntry[];

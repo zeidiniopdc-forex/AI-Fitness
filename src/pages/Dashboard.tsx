@@ -3,22 +3,22 @@ import { useTheme } from '../context/ThemeContext';
 import { getPersianDate, toPersianNumber, formatDateJalali } from '../utils/jalali';
 import { GOAL_LABELS, EXPERIENCE_LABELS } from '../types';
 import { 
-  Dumbbell, TrendingUp, Calendar, Target, 
+  Dumbbell, TrendingUp, Calendar, Target, User,
   Flame, Award, Activity, Clock, Sparkles,
   CheckCircle2, Timer, Zap
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 export default function Dashboard() {
-  const { state } = useAppContext();
+  const { state, activeProfile, sessions, programs, progress, profiles, setActiveProfile } = useAppContext();
   const { theme } = useTheme();
-  const { profile, sessions, programs, progress } = state;
   const isDark = theme === 'dark';
+  const profile = activeProfile;
 
   const totalSessions = sessions.filter(s => s.completed).length;
   const totalVolume = sessions.reduce((acc, s) => acc + s.totalVolume, 0);
   const currentStreak = calculateStreak(sessions);
-  const activeProgram = programs.find(p => p.id === state.activeProgram);
+  const activeProgram = programs.find(p => p.id === (useAppContext().state.activeProgram));
 
   // Get last completed session
   const lastSession = sessions
@@ -51,6 +51,44 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Profile Selector */}
+      {profiles.length > 0 && (
+        <div className={`rounded-2xl p-4 border shadow-lg theme-transition ${
+          isDark 
+            ? 'bg-gradient-to-l from-[#1a1a2e] to-[#16213e] border-[#d4af37]/20' 
+            : 'bg-gradient-to-l from-white to-[#fef9e7] border-[#d4af37]/30'
+        }`}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <User size={18} className={isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'} />
+              <h3 className={`font-bold ${isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'}`}>
+                انتخاب شاگرد
+              </h3>
+            </div>
+            <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              {toPersianNumber(profiles.length)} پروفایل
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {profiles.map(p => (
+              <button
+                key={p.id}
+                onClick={() => setActiveProfile(p.id)}
+                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                  p.id === profile?.id
+                    ? 'bg-gradient-to-l from-[#d4af37] to-[#f0d060] text-[#0d0d1a] shadow-lg shadow-[#d4af37]/30'
+                    : isDark
+                      ? 'bg-[#0d0d1a] text-gray-400 border border-gray-700 hover:border-[#d4af37]'
+                      : 'bg-gray-100 text-gray-600 border border-gray-200 hover:border-[#d4af37]'
+                }`}
+              >
+                {p.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Welcome Section */}
       <div className={`relative rounded-3xl p-6 lg:p-8 border shadow-2xl overflow-hidden theme-transition ${
         isDark 

@@ -13,8 +13,8 @@ export interface AthleteProfile {
   injuries: string[];
   limitations: string[];
   avoidedExercises: string[];
-  primaryGoal: Goal;
-  secondaryGoal?: Goal;
+  primaryGoal: string;
+  secondaryGoal?: string;
   targetMuscles: string[];
   timeline: string;
   trainingHistory: string;
@@ -122,6 +122,10 @@ export const GOAL_LABELS: Record<Goal, string> = {
   competition: 'آمادگی مسابقه',
   general_fitness: 'آمادگی عمومی',
 };
+
+export function getGoalLabel(goal: string): string {
+  return GOAL_LABELS[goal as Goal] || goal;
+}
 
 export const EXPERIENCE_LABELS: Record<string, string> = {
   beginner: 'مبتدی',

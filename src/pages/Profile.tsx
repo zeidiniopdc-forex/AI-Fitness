@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
-import { AthleteProfile, Goal, GOAL_LABELS, EXPERIENCE_LABELS, EQUIPMENT_OPTIONS, MUSCLE_GROUPS } from '../types';
+import { AthleteProfile, Goal, GOAL_LABELS, EXPERIENCE_LABELS, EQUIPMENT_OPTIONS, MUSCLE_GROUPS, getGoalLabel } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { User, Save, ChevronLeft, ChevronRight, Check, Plus, Trash2, Edit } from 'lucide-react';
 import { toPersianNumber } from '../utils/jalali';
@@ -232,7 +232,7 @@ export default function Profile() {
                     وزن: <span className={isDark ? 'text-white' : 'text-gray-900'}>{toPersianNumber(profile.weight)} kg</span>
                   </div>
                   <div className={isDark ? 'text-gray-400' : 'text-gray-600'}>
-                    هدف: <span className={isDark ? 'text-white' : 'text-gray-900'}>{GOAL_LABELS[profile.primaryGoal]}</span>
+                    هدف: <span className={isDark ? 'text-white' : 'text-gray-900'}>{getGoalLabel(profile.primaryGoal)}</span>
                   </div>
                   <div className={isDark ? 'text-gray-400' : 'text-gray-600'}>
                     سطح: <span className={isDark ? 'text-white' : 'text-gray-900'}>{EXPERIENCE_LABELS[profile.experience]}</span>
@@ -494,19 +494,19 @@ function StepGoals({ form, setForm, toggleTargetMuscle, isDark }: any) {
     <div className="space-y-4">
       <h3 className={`font-bold mb-4 ${isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'}`}>اهداف تمرینی</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <SelectField 
-          label="هدف اصلی" 
-          value={form.primaryGoal} 
-          onChange={(v: string) => setForm({ ...form, primaryGoal: v as Goal })}
-          options={Object.entries(GOAL_LABELS).map(([value, label]) => ({ value, label }))}
+        <GoalInput
+          label="هدف اصلی"
+          value={form.primaryGoal || ''}
+          onChange={(v: string) => setForm({ ...form, primaryGoal: v })}
           isDark={isDark}
+          placeholder="هدف خود را تایپ کنید..."
         />
-        <SelectField 
-          label="هدف ثانویه" 
-          value={form.secondaryGoal || ''} 
+        <GoalInput
+          label="هدف ثانویه"
+          value={form.secondaryGoal || ''}
           onChange={(v: string) => setForm({ ...form, secondaryGoal: v || undefined })}
-          options={[{ value: '', label: 'ندارم' }, ...Object.entries(GOAL_LABELS).map(([value, label]) => ({ value, label }))]}
           isDark={isDark}
+          placeholder="هدف ثانویه (اختیاری)..."
         />
       </div>
       <div>
@@ -561,6 +561,71 @@ function InputField({ label, value, onChange, isDark }: { label: string; value: 
             : 'bg-gray-50 border-gray-300 text-gray-900'
         }`}
       />
+    </div>
+  );
+}
+
+function GoalInput({ label, value, onChange, isDark, placeholder }: { 
+  label: string; 
+  value: string; 
+  onChange: (v: string) => void; 
+  isDark: boolean;
+  placeholder?: string;
+}) {
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestions = Object.values(GOAL_LABELS);
+  const filteredSuggestions = suggestions.filter(s => 
+    s.toLowerCase().includes(value.toLowerCase()) && s !== value
+  );
+
+  return (
+    <div className="relative">
+      <label className={`text-sm mb-1 block ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{label}</label>
+      <input
+        type="text"
+        value={value || ''}
+        onChange={e => {
+          onChange(e.target.value);
+          setShowSuggestions(true);
+        }}
+        onFocus={() => setShowSuggestions(true)}
+        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+        placeholder={placeholder}
+        className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:border-[#d4af37] focus:outline-none theme-transition ${
+          isDark 
+            ? 'bg-[#0d0d1a] border-gray-700 text-white' 
+            : 'bg-gray-50 border-gray-300 text-gray-900'
+        }`}
+      />
+      {showSuggestions && filteredSuggestions.length > 0 && (
+        <div className={`absolute z-10 w-full mt-1 rounded-xl border shadow-lg max-h-48 overflow-y-auto theme-transition ${
+          isDark 
+            ? 'bg-[#1a1a2e] border-gray-700' 
+            : 'bg-white border-gray-200'
+        }`}>
+          {filteredSuggestions.map((suggestion, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => {
+                onChange(suggestion);
+                setShowSuggestions(false);
+              }}
+              className={`w-full text-right px-4 py-2 text-sm transition-all ${
+                isDark 
+                  ? 'text-gray-300 hover:bg-[#d4af37]/10 hover:text-[#d4af37]' 
+                  : 'text-gray-700 hover:bg-[#d4af37]/10 hover:text-[#b8941f]'
+              }`}
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      )}
+      <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+        می‌توانید هدف دلخواه خود را تایپ کنید یا از پیشنهادات انتخاب کنید
+      </p>
     </div>
   );
 }

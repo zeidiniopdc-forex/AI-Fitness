@@ -1,7 +1,7 @@
 import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
 import { getPersianDate, toPersianNumber, formatDateJalali } from '../utils/jalali';
-import { GOAL_LABELS, EXPERIENCE_LABELS } from '../types';
+import { GOAL_LABELS, EXPERIENCE_LABELS, getGoalLabel } from '../types';
 import { 
   Dumbbell, TrendingUp, Calendar, Target, User,
   Flame, Award, Activity, Clock, Sparkles,
@@ -253,7 +253,7 @@ export default function Dashboard() {
             </h3>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <InfoItem label="هدف اصلی" value={GOAL_LABELS[profile.primaryGoal]} isDark={isDark} />
+            <InfoItem label="هدف اصلی" value={getGoalLabel(profile.primaryGoal)} isDark={isDark} />
             <InfoItem label="سطح تجربه" value={EXPERIENCE_LABELS[profile.experience]} isDark={isDark} />
             <InfoItem label="روزهای تمرین" value={`${toPersianNumber(profile.trainingDays)} روز/هفته`} isDark={isDark} />
             <InfoItem label="مدت جلسه" value={`${toPersianNumber(profile.sessionDuration)} دقیقه`} isDark={isDark} />

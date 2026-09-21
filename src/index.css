@@ -23,6 +23,17 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Fix word spacing for Persian text */
+body, input, textarea, select, button {
+  word-spacing: 0.1em;
+  letter-spacing: normal;
+}
+
+/* Ensure proper spacing in RTL text */
+[dir="rtl"] * {
+  word-spacing: 0.1em;
+}
+
 /* Dark Theme (Default) */
 body {
   background-color: #0a0a15;

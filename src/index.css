@@ -205,12 +205,32 @@ button, a {
   background: linear-gradient(135deg, #ffffff 0%, #f0fdfa 100%);
 }
 
-/* Word spacing fix */
-body, input, textarea, select, button {
-  word-spacing: 0.1em;
-  letter-spacing: normal;
+/* Fix Persian typing spacing - CRITICAL */
+input, textarea, select, button {
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
 }
 
-[dir="rtl"] * {
-  word-spacing: 0.1em;
+/* Ensure space character works properly */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+textarea {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* RTL specific fixes */
+[dir="rtl"] input,
+[dir="rtl"] textarea {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Font rendering optimization */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }

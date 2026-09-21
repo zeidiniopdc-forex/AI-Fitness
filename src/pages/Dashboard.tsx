@@ -1,380 +1,444 @@
 import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
-import { getPersianDate, toPersianNumber, formatDateJalali } from '../utils/jalali';
-import { GOAL_LABELS, EXPERIENCE_LABELS, getGoalLabel } from '../types';
+import { getPersianDate, toPersianNumber, getTodayJalali, getWeekdayName, getMonthName } from '../utils/jalali';
+import { EXPERIENCE_LABELS, getGoalLabel } from '../types';
 import { 
-  Dumbbell, TrendingUp, Calendar, Target, User,
+  Dumbbell, TrendingUp, Calendar, Target, 
   Flame, Award, Activity, Clock, Sparkles,
-  CheckCircle2, Timer, Zap
+  CheckCircle2, Timer, Zap, User, ChevronLeft,
+  Trophy, TrendingDown, Heart
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { useNavigate } from 'react-router-dom';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 export default function Dashboard() {
   const { state, activeProfile, sessions, programs, progress, profiles, setActiveProfile } = useAppContext();
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const isDark = theme === 'dark';
   const profile = activeProfile;
 
-  const totalSessions = sessions.filter(s => s.completed).length;
-  const totalVolume = sessions.reduce((acc, s) => acc + s.totalVolume, 0);
+  const completedSessions = sessions.filter(s => s.completed);
+  const totalSessions = completedSessions.length;
+  const totalVolume = completedSessions.reduce((acc, s) => acc + s.totalVolume, 0);
   const currentStreak = calculateStreak(sessions);
-  const activeProgram = programs.find(p => p.id === (useAppContext().state.activeProgram));
+  const activeProgram = programs.find(p => p.id === state.activeProgram);
 
-  // Get last completed session
-  const lastSession = sessions
-    .filter(s => s.completed)
+  // Today's workout
+  const today = new Date();
+  const dayOfWeek = (today.getDay() + 1) % 7; // Saturday = 0
+  const todayWorkout = activeProgram?.days[dayOfWeek % (activeProgram?.days.length || 1)];
+
+  // Last session
+  const lastSession = completedSessions
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
 
-  const weightData = progress
-    .slice(-10)
-    .map(p => ({
-      date: p.date.split('-').slice(1).join('/'),
-      weight: p.weight,
-    }));
+  // Weekly data
+  const weekData = getWeekData(sessions);
+  const weeklyGoal = profile?.trainingDays || 4;
+  const weeklyCompleted = weekData.filter(d => d.sessions > 0).length;
+  const weeklyProgress = Math.min(100, (weeklyCompleted / weeklyGoal) * 100);
 
-  const sessionData = getLast7DaysSessions(sessions);
+  const weightData = progress.slice(-10).map(p => ({
+    date: p.date.split('-').slice(1).join('/'),
+    weight: p.weight,
+  }));
 
-  // Calculate session duration
+  // Get session duration
   const getSessionDuration = (session: any) => {
     if (!session.startTime || !session.endTime) return null;
     const start = new Date(session.startTime).getTime();
     const end = new Date(session.endTime).getTime();
-    const durationMs = end - start;
-    const minutes = Math.floor(durationMs / 60000);
+    const minutes = Math.floor((end - start) / 60000);
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
-    if (hours > 0) {
-      return `${toPersianNumber(hours)} ساعت و ${toPersianNumber(mins)} دقیقه`;
-    }
+    if (hours > 0) return `${toPersianNumber(hours)} ساعت و ${toPersianNumber(mins)} دقیقه`;
     return `${toPersianNumber(minutes)} دقیقه`;
   };
 
   return (
-    <div className="space-y-6">
-      {/* Profile Selector */}
-      {profiles.length > 0 && (
-        <div className={`rounded-2xl p-4 border shadow-lg theme-transition ${
+    <div className="space-y-5">
+      {/* Profile Selector - Compact */}
+      {profiles.length > 1 && (
+        <div className={`rounded-2xl p-3 border theme-transition ${
           isDark 
-            ? 'bg-gradient-to-l from-[#1a1a2e] to-[#16213e] border-[#d4af37]/20' 
-            : 'bg-gradient-to-l from-white to-[#fef9e7] border-[#d4af37]/30'
+            ? 'bg-[#1a1a2e]/50 border-[#d4af37]/10' 
+            : 'bg-white/70 border-[#14b8a6]/20'
         }`}>
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <User size={18} className={isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'} />
-              <h3 className={`font-bold ${isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'}`}>
-                انتخاب شاگرد
-              </h3>
+          <div className="flex items-center gap-2 overflow-x-auto">
+            <User size={16} className={isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'} />
+            <div className="flex gap-2">
+              {profiles.map(p => (
+                <button
+                  key={p.id}
+                  onClick={() => setActiveProfile(p.id)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
+                    p.id === profile?.id
+                      ? isDark
+                        ? 'bg-gradient-to-l from-[#d4af37] to-[#f0d060] text-[#0d0d1a]'
+                        : 'bg-gradient-to-l from-[#14b8a6] to-[#0d9488] text-white'
+                      : isDark
+                        ? 'bg-[#0d0d1a] text-gray-400 hover:text-white'
+                        : 'bg-[#f0fdfa] text-[#0f766e] hover:bg-[#ccfbf1]'
+                  }`}
+                >
+                  {p.name}
+                </button>
+              ))}
             </div>
-            <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              {toPersianNumber(profiles.length)} پروفایل
-            </span>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {profiles.map(p => (
-              <button
-                key={p.id}
-                onClick={() => setActiveProfile(p.id)}
-                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                  p.id === profile?.id
-                    ? 'bg-gradient-to-l from-[#d4af37] to-[#f0d060] text-[#0d0d1a] shadow-lg shadow-[#d4af37]/30'
-                    : isDark
-                      ? 'bg-[#0d0d1a] text-gray-400 border border-gray-700 hover:border-[#d4af37]'
-                      : 'bg-gray-100 text-gray-600 border border-gray-200 hover:border-[#d4af37]'
-                }`}
-              >
-                {p.name}
-              </button>
-            ))}
           </div>
         </div>
       )}
 
-      {/* Welcome Section */}
-      <div className={`relative rounded-3xl p-6 lg:p-8 border shadow-2xl overflow-hidden theme-transition ${
+      {/* Hero Section - Today's Workout */}
+      {todayWorkout && (
+        <div className={`relative rounded-3xl p-6 overflow-hidden theme-transition ${
+          isDark 
+            ? 'bg-gradient-to-bl from-[#1a1a2e] via-[#16213e] to-[#1a1a2e] border border-[#d4af37]/20' 
+            : 'bg-gradient-to-bl from-[#f0fdfa] via-[#ccfbf1] to-[#ecfdf5] border border-[#14b8a6]/30'
+        }`}>
+          {/* Background decoration */}
+          <div className={`absolute top-0 left-0 w-40 h-40 rounded-full blur-3xl ${
+            isDark ? 'bg-[#d4af37]/10' : 'bg-[#14b8a6]/20'
+          }`} />
+          <div className={`absolute bottom-0 right-0 w-32 h-32 rounded-full blur-3xl ${
+            isDark ? 'bg-[#4a90d9]/10' : 'bg-[#0d9488]/10'
+          }`} />
+          
+          <div className="relative">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <div className={`w-2 h-2 rounded-full animate-pulse ${
+                    isDark ? 'bg-[#d4af37]' : 'bg-[#14b8a6]'
+                  }`} />
+                  <span className={`text-xs font-bold ${
+                    isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'
+                  }`}>
+                    تمرین امروز
+                  </span>
+                </div>
+                <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+                  {todayWorkout.day}
+                </h2>
+                <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+                  {getWeekdayName(today)}، {toPersianNumber(getTodayJalali().day)} {getMonthName(getTodayJalali().month)}
+                </p>
+              </div>
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${
+                isDark 
+                  ? 'bg-gradient-to-br from-[#d4af37] to-[#f0d060] shadow-lg shadow-[#d4af37]/30' 
+                  : 'bg-gradient-to-br from-[#14b8a6] to-[#0d9488] shadow-lg shadow-[#14b8a6]/30'
+              }`}>
+                <Dumbbell size={32} className={isDark ? 'text-[#0d0d1a]' : 'text-white'} />
+              </div>
+            </div>
+
+            {/* Muscle Groups */}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {todayWorkout.muscleGroups.map((mg, i) => (
+                <span key={i} className={`px-3 py-1 rounded-full text-xs font-bold ${
+                  isDark 
+                    ? 'bg-[#4a90d9]/20 text-[#6bb5ff]' 
+                    : 'bg-[#14b8a6]/15 text-[#0d9488]'
+                }`}>
+                  {mg}
+                </span>
+              ))}
+            </div>
+
+            {/* Stats Row */}
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className={`rounded-xl p-3 ${
+                isDark ? 'bg-[#0d0d1a]/50' : 'bg-white/70'
+              }`}>
+                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>تمرینات</p>
+                <p className={`text-lg font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+                  {toPersianNumber(todayWorkout.exercises.length)}
+                </p>
+              </div>
+              <div className={`rounded-xl p-3 ${
+                isDark ? 'bg-[#0d0d1a]/50' : 'bg-white/70'
+              }`}>
+                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>ست‌ها</p>
+                <p className={`text-lg font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+                  {toPersianNumber(todayWorkout.exercises.reduce((a, e) => a + e.sets, 0))}
+                </p>
+              </div>
+              <div className={`rounded-xl p-3 ${
+                isDark ? 'bg-[#0d0d1a]/50' : 'bg-white/70'
+              }`}>
+                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>زمان تقریبی</p>
+                <p className={`text-lg font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+                  {toPersianNumber(Math.round(todayWorkout.exercises.reduce((a: number, e) => a + (e.sets * (parseInt(e.reps) || 10) * 3 + e.rest * e.sets) / 60, 0)))}
+                  <span className="text-xs">د</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Start Button */}
+            <button
+              onClick={() => navigate('/workout')}
+              className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+                isDark 
+                  ? 'bg-gradient-to-l from-[#d4af37] to-[#f0d060] text-[#0d0d1a] shadow-lg shadow-[#d4af37]/30 hover:opacity-90' 
+                  : 'bg-gradient-to-l from-[#14b8a6] to-[#0d9488] text-white shadow-lg shadow-[#14b8a6]/30 hover:opacity-90'
+              }`}
+            >
+              <span>شروع تمرین</span>
+              <ChevronLeft size={18} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Stats Grid - Professional */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <StatCard
+          icon={<Activity size={18} />}
+          label="جلسات"
+          value={toPersianNumber(totalSessions)}
+          subtext="تکمیل شده"
+          color={isDark ? 'text-[#4a90d9]' : 'text-[#0d9488]'}
+          bgColor={isDark ? 'bg-[#4a90d9]/10' : 'bg-[#14b8a6]/10'}
+          borderColor={isDark ? 'border-[#4a90d9]/20' : 'border-[#14b8a6]/20'}
+          isDark={isDark}
+        />
+        <StatCard
+          icon={<TrendingUp size={18} />}
+          label="حجم کل"
+          value={toPersianNumber(totalVolume.toLocaleString())}
+          subtext="کیلوگرم"
+          color={isDark ? 'text-[#22c55e]' : 'text-[#059669]'}
+          bgColor={isDark ? 'bg-[#22c55e]/10' : 'bg-[#10b981]/10'}
+          borderColor={isDark ? 'border-[#22c55e]/20' : 'border-[#10b981]/20'}
+          isDark={isDark}
+        />
+        <StatCard
+          icon={<Flame size={18} />}
+          label="استریک"
+          value={toPersianNumber(currentStreak)}
+          subtext="روز متوالی"
+          color={isDark ? 'text-[#f59e0b]' : 'text-[#d97706]'}
+          bgColor={isDark ? 'bg-[#f59e0b]/10' : 'bg-[#f59e0b]/10'}
+          borderColor={isDark ? 'border-[#f59e0b]/20' : 'border-[#f59e0b]/20'}
+          isDark={isDark}
+        />
+        <StatCard
+          icon={<Target size={18} />}
+          label="هدف هفتگی"
+          value={`${toPersianNumber(weeklyCompleted)}/${toPersianNumber(weeklyGoal)}`}
+          subtext="جلسه"
+          color={isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}
+          bgColor={isDark ? 'bg-[#d4af37]/10' : 'bg-[#14b8a6]/10'}
+          borderColor={isDark ? 'border-[#d4af37]/20' : 'border-[#14b8a6]/20'}
+          isDark={isDark}
+          progress={weeklyProgress}
+        />
+      </div>
+
+      {/* Weekly Progress Bar */}
+      <div className={`rounded-2xl p-5 border theme-transition ${
         isDark 
-          ? 'bg-gradient-to-l from-[#1a1a2e] via-[#16213e] to-[#1a1a2e] border-[#d4af37]/20' 
-          : 'bg-gradient-to-l from-white via-[#fef9e7] to-white border-[#d4af37]/30'
+          ? 'bg-[#1a1a2e] border-[#d4af37]/10' 
+          : 'bg-white border-[#14b8a6]/15'
       }`}>
-        {/* Decorative Elements */}
-        <div className={`absolute top-0 left-0 w-32 h-32 rounded-full blur-3xl ${
-          isDark ? 'bg-[#d4af37]/10' : 'bg-[#d4af37]/5'
-        }`} />
-        <div className={`absolute bottom-0 right-0 w-40 h-40 rounded-full blur-3xl ${
-          isDark ? 'bg-[#4a90d9]/10' : 'bg-[#4a90d9]/5'
-        }`} />
+        <div className="flex items-center justify-between mb-3">
+          <h3 className={`font-bold flex items-center gap-2 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+            <Calendar size={16} />
+            پیشرفت هفتگی
+          </h3>
+          <span className={`text-xs font-bold ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+            {toPersianNumber(Math.round(weeklyProgress))}٪
+          </span>
+        </div>
         
-        <div className="relative flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles size={16} className={isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'} />
-              <span className={`text-xs font-bold ${isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'}`}>
-                خوش آمدید
-              </span>
-            </div>
-            <h2 className={`text-2xl lg:text-3xl font-bold mb-2 ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              {profile ? `${profile.name} عزیز 👋` : 'به دستیار هوشمند خوش آمدید 👋'}
-            </h2>
-            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              {getPersianDate()}
-            </p>
-          </div>
-          <div className="hidden sm:block">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#d4af37] to-[#f0d060] flex items-center justify-center shadow-2xl shadow-[#d4af37]/30 rotate-6 hover:rotate-0 transition-transform">
-              <Dumbbell size={40} className="text-[#0d0d1a]" />
-            </div>
-          </div>
+        {/* Progress Bar */}
+        <div className={`w-full h-3 rounded-full overflow-hidden mb-3 ${
+          isDark ? 'bg-gray-800' : 'bg-[#f0fdfa]'
+        }`}>
+          <div 
+            className={`h-full rounded-full transition-all duration-1000 ${
+              isDark 
+                ? 'bg-gradient-to-l from-[#d4af37] to-[#f0d060]' 
+                : 'bg-gradient-to-l from-[#14b8a6] to-[#0d9488]'
+            }`}
+            style={{ width: `${weeklyProgress}%` }}
+          />
+        </div>
+
+        {/* Week Days */}
+        <div className="flex justify-between">
+          {['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'].map((day, i) => {
+            const hasSession = weekData[i]?.sessions > 0;
+            const isToday = i === dayOfWeek;
+            return (
+              <div key={i} className="flex flex-col items-center gap-1">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  hasSession 
+                    ? isDark 
+                      ? 'bg-[#d4af37] text-[#0d0d1a]' 
+                      : 'bg-[#14b8a6] text-white'
+                    : isToday
+                      ? isDark 
+                        ? 'bg-[#d4af37]/20 text-[#d4af37] border border-[#d4af37]/50' 
+                        : 'bg-[#14b8a6]/20 text-[#0d9488] border border-[#14b8a6]/50'
+                      : isDark 
+                        ? 'bg-gray-800 text-gray-500' 
+                        : 'bg-[#f0fdfa] text-[#0f766e]/50'
+                }`}>
+                  {hasSession ? <CheckCircle2 size={14} /> : day}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {/* Last Session Card */}
       {lastSession && (
-        <div className={`rounded-2xl p-5 border shadow-lg theme-transition ${
+        <div className={`rounded-2xl p-5 border theme-transition ${
           isDark 
             ? 'bg-gradient-to-l from-[#22c55e]/5 to-transparent border-[#22c55e]/20' 
-            : 'bg-gradient-to-l from-[#22c55e]/5 to-white border-[#22c55e]/30'
+            : 'bg-gradient-to-l from-[#ecfdf5] to-white border-[#10b981]/20'
         }`}>
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                isDark ? 'bg-[#22c55e]/20' : 'bg-[#22c55e]/10'
+            <div className="flex items-center gap-3">
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${
+                isDark ? 'bg-[#22c55e]/20' : 'bg-[#10b981]/15'
               }`}>
-                <CheckCircle2 size={20} className="text-[#22c55e]" />
+                <Trophy size={20} className={isDark ? 'text-[#22c55e]' : 'text-[#059669]'} />
               </div>
               <div>
-                <h3 className={`font-bold ${isDark ? 'text-[#22c55e]' : 'text-[#16a34a]'}`}>
-                  آخرین جلسه تمرین
+                <h3 className={`font-bold ${isDark ? 'text-[#22c55e]' : 'text-[#059669]'}`}>
+                  آخرین جلسه
                 </h3>
-                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                  {formatDateJalali(lastSession.date)}
+                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+                  {new Date(lastSession.date).toLocaleDateString('fa-IR')}
                 </p>
               </div>
             </div>
             <div className={`px-3 py-1 rounded-full text-xs font-bold ${
-              isDark ? 'bg-[#22c55e]/20 text-[#22c55e]' : 'bg-[#22c55e]/10 text-[#16a34a]'
+              isDark ? 'bg-[#22c55e]/20 text-[#22c55e]' : 'bg-[#10b981]/15 text-[#059669]'
             }`}>
-              تکمیل شده ✓
+              تکمیل ✓
             </div>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className={`rounded-xl p-3 ${isDark ? 'bg-[#0d0d1a]' : 'bg-white'}`}>
-              <div className="flex items-center gap-2 mb-1">
-                <Timer size={14} className={isDark ? 'text-gray-400' : 'text-gray-500'} />
-                <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>مدت زمان</span>
-              </div>
-              <p className={`font-bold text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          <div className="grid grid-cols-3 gap-3">
+            <div className={`rounded-xl p-3 ${isDark ? 'bg-[#0d0d1a]/50' : 'bg-white/70'}`}>
+              <Timer size={14} className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'} />
+              <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>مدت</p>
+              <p className={`font-bold text-sm ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
                 {getSessionDuration(lastSession) || '-'}
               </p>
             </div>
-            <div className={`rounded-xl p-3 ${isDark ? 'bg-[#0d0d1a]' : 'bg-white'}`}>
-              <div className="flex items-center gap-2 mb-1">
-                <Zap size={14} className={isDark ? 'text-gray-400' : 'text-gray-500'} />
-                <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>ست‌های انجام شده</span>
-              </div>
-              <p className={`font-bold text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                {toPersianNumber(lastSession.sets.filter(s => s.completed).length)} ست
+            <div className={`rounded-xl p-3 ${isDark ? 'bg-[#0d0d1a]/50' : 'bg-white/70'}`}>
+              <Zap size={14} className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'} />
+              <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>ست‌ها</p>
+              <p className={`font-bold text-sm ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+                {toPersianNumber(lastSession.sets.filter(s => s.completed).length)}
               </p>
             </div>
-            <div className={`rounded-xl p-3 ${isDark ? 'bg-[#0d0d1a]' : 'bg-white'}`}>
-              <div className="flex items-center gap-2 mb-1">
-                <TrendingUp size={14} className={isDark ? 'text-gray-400' : 'text-gray-500'} />
-                <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>حجم کل</span>
-              </div>
-              <p className={`font-bold text-sm ${isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'}`}>
+            <div className={`rounded-xl p-3 ${isDark ? 'bg-[#0d0d1a]/50' : 'bg-white/70'}`}>
+              <TrendingUp size={14} className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'} />
+              <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>حجم</p>
+              <p className={`font-bold text-sm ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
                 {toPersianNumber(lastSession.totalVolume)} kg
               </p>
             </div>
-            <div className={`rounded-xl p-3 ${isDark ? 'bg-[#0d0d1a]' : 'bg-white'}`}>
-              <div className="flex items-center gap-2 mb-1">
-                <Dumbbell size={14} className={isDark ? 'text-gray-400' : 'text-gray-500'} />
-                <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>تعداد تمرینات</span>
-              </div>
-              <p className={`font-bold text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                {toPersianNumber(new Set(lastSession.sets.map(s => s.exerciseId)).size)} تمرین
-              </p>
-            </div>
           </div>
         </div>
       )}
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
-        <StatCard
-          icon={<Activity size={20} />}
-          label="جلسات انجام شده"
-          value={toPersianNumber(totalSessions)}
-          color="text-[#4a90d9]"
-          bgColor={isDark ? "bg-[#4a90d9]/10" : "bg-[#4a90d9]/5"}
-          borderColor={isDark ? "border-[#4a90d9]/20" : "border-[#4a90d9]/30"}
-          isDark={isDark}
-        />
-        <StatCard
-          icon={<TrendingUp size={20} />}
-          label="حجم کل (کیلوگرم)"
-          value={toPersianNumber(totalVolume.toLocaleString())}
-          color="text-[#22c55e]"
-          bgColor={isDark ? "bg-[#22c55e]/10" : "bg-[#22c55e]/5"}
-          borderColor={isDark ? "border-[#22c55e]/20" : "border-[#22c55e]/30"}
-          isDark={isDark}
-        />
-        <StatCard
-          icon={<Flame size={20} />}
-          label="روزهای متوالی"
-          value={toPersianNumber(currentStreak)}
-          color="text-[#f59e0b]"
-          bgColor={isDark ? "bg-[#f59e0b]/10" : "bg-[#f59e0b]/5"}
-          borderColor={isDark ? "border-[#f59e0b]/20" : "border-[#f59e0b]/30"}
-          isDark={isDark}
-        />
-        <StatCard
-          icon={<Calendar size={20} />}
-          label="برنامه‌های فعال"
-          value={toPersianNumber(programs.length)}
-          color="text-[#d4af37]"
-          bgColor={isDark ? "bg-[#d4af37]/10" : "bg-[#d4af37]/5"}
-          borderColor={isDark ? "border-[#d4af37]/20" : "border-[#d4af37]/30"}
-          isDark={isDark}
-        />
-      </div>
 
       {/* Profile Summary */}
       {profile && (
-        <div className={`rounded-2xl p-6 border shadow-lg theme-transition ${
+        <div className={`rounded-2xl p-5 border theme-transition ${
           isDark 
-            ? 'bg-gradient-to-l from-[#1a1a2e] to-[#16213e] border-[#d4af37]/10' 
-            : 'bg-gradient-to-l from-white to-[#fef9e7] border-[#d4af37]/20'
+            ? 'bg-[#1a1a2e] border-[#d4af37]/10' 
+            : 'bg-white border-[#14b8a6]/15'
         }`}>
-          <div className="flex items-center gap-2 mb-4">
-            <Target size={18} className={isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'} />
-            <h3 className={`font-bold ${isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'}`}>
-              خلاصه پروفایل
+          <div className="flex items-center justify-between mb-4">
+            <h3 className={`font-bold flex items-center gap-2 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+              <User size={16} />
+              {profile.name}
             </h3>
+            <button
+              onClick={() => navigate('/profile')}
+              className={`text-xs ${isDark ? 'text-gray-400 hover:text-white' : 'text-[#0f766e]/70 hover:text-[#0d9488]'}`}
+            >
+              ویرایش
+            </button>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <InfoItem label="هدف اصلی" value={getGoalLabel(profile.primaryGoal)} isDark={isDark} />
-            <InfoItem label="سطح تجربه" value={EXPERIENCE_LABELS[profile.experience]} isDark={isDark} />
-            <InfoItem label="روزهای تمرین" value={`${toPersianNumber(profile.trainingDays)} روز/هفته`} isDark={isDark} />
-            <InfoItem label="مدت جلسه" value={`${toPersianNumber(profile.sessionDuration)} دقیقه`} isDark={isDark} />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <InfoItem label="هدف" value={getGoalLabel(profile.primaryGoal)} isDark={isDark} />
+            <InfoItem label="سطح" value={EXPERIENCE_LABELS[profile.experience]} isDark={isDark} />
+            <InfoItem label="وزن" value={`${toPersianNumber(profile.weight)} kg`} isDark={isDark} />
+            <InfoItem label="قد" value={`${toPersianNumber(profile.height)} cm`} isDark={isDark} />
           </div>
         </div>
       )}
 
-      {/* Active Program */}
-      {activeProgram && (
-        <div className={`rounded-2xl p-6 border shadow-lg theme-transition ${
+      {/* Weight Trend Chart */}
+      {weightData.length > 1 && (
+        <div className={`rounded-2xl p-5 border theme-transition ${
           isDark 
-            ? 'bg-gradient-to-l from-[#22c55e]/5 to-transparent border-[#22c55e]/20' 
-            : 'bg-gradient-to-l from-[#22c55e]/5 to-white border-[#22c55e]/30'
+            ? 'bg-[#1a1a2e] border-[#d4af37]/10' 
+            : 'bg-white border-[#14b8a6]/15'
         }`}>
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Award size={18} className="text-[#22c55e]" />
-              <h3 className={`font-bold ${isDark ? 'text-[#22c55e]' : 'text-[#16a34a]'}`}>
-                برنامه فعال
-              </h3>
-            </div>
-            <span className={`text-xs px-3 py-1 rounded-full font-bold ${
-              isDark ? 'bg-[#22c55e]/20 text-[#22c55e]' : 'bg-[#22c55e]/10 text-[#16a34a]'
-            }`}>
-              فعال
-            </span>
-          </div>
-          <p className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
-            {activeProgram.name}
-          </p>
-          <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            {activeProgram.duration} • {toPersianNumber(activeProgram.days.length)} روز تمرینی
-          </p>
-        </div>
-      )}
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Weight Trend */}
-        {weightData.length > 0 && (
-          <div className={`rounded-2xl p-5 border shadow-lg theme-transition ${
-            isDark 
-              ? 'bg-gradient-to-b from-[#1a1a2e] to-[#16213e] border-[#d4af37]/10' 
-              : 'bg-gradient-to-b from-white to-[#fef9e7] border-[#d4af37]/20'
-          }`}>
-            <h3 className={`font-bold mb-4 flex items-center gap-2 ${
-              isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'
-            }`}>
-              <TrendingUp size={18} />
-              روند وزن
-            </h3>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={weightData}>
-                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#333" : "#e5e7eb"} />
-                <XAxis dataKey="date" stroke={isDark ? "#888" : "#6b7280"} fontSize={10} />
-                <YAxis stroke={isDark ? "#888" : "#6b7280"} fontSize={10} domain={['dataMin - 2', 'dataMax + 2']} />
-                <Tooltip 
-                  contentStyle={{ 
-                    background: isDark ? '#1a1a2e' : '#ffffff', 
-                    border: `1px solid ${isDark ? '#d4af37' : '#b8941f'}`, 
-                    borderRadius: '12px',
-                    color: isDark ? '#e2e8f0' : '#1e293b'
-                  }}
-                  labelStyle={{ color: isDark ? '#d4af37' : '#b8941f' }}
-                />
-                <Line type="monotone" dataKey="weight" stroke="#d4af37" strokeWidth={2} dot={{ fill: '#d4af37' }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-
-        {/* Weekly Sessions */}
-        <div className={`rounded-2xl p-5 border shadow-lg theme-transition ${
-          isDark 
-            ? 'bg-gradient-to-b from-[#1a1a2e] to-[#16213e] border-[#d4af37]/10' 
-            : 'bg-gradient-to-b from-white to-[#fef9e7] border-[#d4af37]/20'
-        }`}>
-          <h3 className={`font-bold mb-4 flex items-center gap-2 ${
-            isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'
-          }`}>
-            <Clock size={18} />
-            جلسات ۷ روز اخیر
+          <h3 className={`font-bold mb-4 flex items-center gap-2 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+            <TrendingUp size={16} />
+            روند وزن
           </h3>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={sessionData}>
+          <ResponsiveContainer width="100%" height={180}>
+            <AreaChart data={weightData}>
+              <defs>
+                <linearGradient id="weightGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={isDark ? '#d4af37' : '#14b8a6'} stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor={isDark ? '#d4af37' : '#14b8a6'} stopOpacity={0}/>
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#333" : "#e5e7eb"} />
-              <XAxis dataKey="day" stroke={isDark ? "#888" : "#6b7280"} fontSize={10} />
-              <YAxis stroke={isDark ? "#888" : "#6b7280"} fontSize={10} />
+              <XAxis dataKey="date" stroke={isDark ? "#888" : "#6b7280"} fontSize={10} />
+              <YAxis stroke={isDark ? "#888" : "#6b7280"} fontSize={10} domain={['dataMin - 2', 'dataMax + 2']} />
               <Tooltip 
                 contentStyle={{ 
                   background: isDark ? '#1a1a2e' : '#ffffff', 
-                  border: `1px solid ${isDark ? '#4a90d9' : '#3b82f6'}`, 
+                  border: `1px solid ${isDark ? '#d4af37' : '#14b8a6'}`, 
                   borderRadius: '12px',
-                  color: isDark ? '#e2e8f0' : '#1e293b'
+                  color: isDark ? '#e2e8f0' : '#134e4a'
                 }}
-                labelStyle={{ color: isDark ? '#4a90d9' : '#3b82f6' }}
               />
-              <Bar dataKey="sessions" fill="#4a90d9" radius={[8, 8, 0, 0]} />
-            </BarChart>
+              <Area 
+                type="monotone" 
+                dataKey="weight" 
+                stroke={isDark ? '#d4af37' : '#14b8a6'} 
+                strokeWidth={2}
+                fill="url(#weightGradient)"
+              />
+            </AreaChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      )}
 
-      {/* Quick Actions */}
+      {/* Empty State */}
       {!profile && (
-        <div className={`rounded-2xl p-6 border shadow-lg theme-transition ${
+        <div className={`rounded-2xl p-6 border theme-transition ${
           isDark 
             ? 'bg-gradient-to-l from-[#d4af37]/10 to-transparent border-[#d4af37]/30' 
-            : 'bg-gradient-to-l from-[#d4af37]/10 to-white border-[#d4af37]/30'
+            : 'bg-gradient-to-l from-[#f0fdfa] to-white border-[#14b8a6]/30'
         }`}>
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-              isDark ? 'bg-[#d4af37]/20' : 'bg-[#d4af37]/10'
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+              isDark ? 'bg-[#d4af37]/20' : 'bg-[#14b8a6]/15'
             }`}>
-              <Sparkles size={20} className={isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'} />
+              <Sparkles size={24} className={isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'} />
             </div>
             <div>
-              <p className={`font-bold ${isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'}`}>
+              <p className={`font-bold ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
                 ⚡ شروع کنید
               </p>
-              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
                 برای شروع، ابتدا پروفایل ورزشکار خود را تکمیل کنید
               </p>
             </div>
@@ -385,31 +449,42 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ icon, label, value, color, bgColor, borderColor, isDark }: { 
-  icon: React.ReactNode; label: string; value: string; color: string; bgColor: string; borderColor: string; isDark: boolean;
+function StatCard({ icon, label, value, subtext, color, bgColor, borderColor, isDark, progress }: { 
+  icon: React.ReactNode; label: string; value: string; subtext: string; 
+  color: string; bgColor: string; borderColor: string; isDark: boolean;
+  progress?: number;
 }) {
   return (
-    <div className={`rounded-2xl p-4 border shadow-lg hover:scale-[1.02] transition-transform theme-transition ${
+    <div className={`rounded-2xl p-4 border theme-transition ${
       isDark 
         ? `bg-gradient-to-b from-[#1a1a2e] to-[#16213e] ${borderColor}` 
-        : `bg-gradient-to-b from-white to-[#fef9e7] ${borderColor}`
+        : `bg-gradient-to-b from-white to-[#f0fdfa] ${borderColor}`
     }`}>
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color} mb-3 ${bgColor}`}>
+      <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-2 ${bgColor} ${color}`}>
         {icon}
       </div>
-      <p className={`text-xs mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{label}</p>
-      <p className={`text-2xl font-bold ${color}`}>{value}</p>
+      <p className={`text-xs mb-0.5 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>{label}</p>
+      <p className={`text-xl font-bold ${color}`}>{value}</p>
+      <p className={`text-[10px] ${isDark ? 'text-gray-500' : 'text-[#0f766e]/50'}`}>{subtext}</p>
+      {progress !== undefined && (
+        <div className={`w-full h-1 rounded-full mt-2 ${isDark ? 'bg-gray-800' : 'bg-[#f0fdfa]'}`}>
+          <div 
+            className={`h-full rounded-full transition-all duration-1000 ${
+              isDark ? 'bg-[#d4af37]' : 'bg-[#14b8a6]'
+            }`}
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      )}
     </div>
   );
 }
 
 function InfoItem({ label, value, isDark }: { label: string; value: string; isDark: boolean }) {
   return (
-    <div className={`rounded-xl p-3 theme-transition ${
-      isDark ? 'bg-[#0d0d1a]' : 'bg-white'
-    }`}>
-      <p className={`text-xs mb-1 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>{label}</p>
-      <p className={`text-sm font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{value}</p>
+    <div className={`rounded-xl p-3 ${isDark ? 'bg-[#0d0d1a]' : 'bg-[#f0fdfa]'}`}>
+      <p className={`text-xs mb-1 ${isDark ? 'text-gray-500' : 'text-[#0f766e]/60'}`}>{label}</p>
+      <p className={`text-sm font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>{value}</p>
     </div>
   );
 }
@@ -434,7 +509,7 @@ function calculateStreak(sessions: any[]): number {
   return streak;
 }
 
-function getLast7DaysSessions(sessions: any[]): { day: string; sessions: number }[] {
+function getWeekData(sessions: any[]): { day: string; sessions: number }[] {
   const days = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
   const result: { day: string; sessions: number }[] = [];
   
@@ -442,7 +517,9 @@ function getLast7DaysSessions(sessions: any[]): { day: string; sessions: number 
     const date = new Date();
     date.setDate(date.getDate() - i);
     const dayStr = date.toDateString();
-    const count = sessions.filter(s => new Date(s.date).toDateString() === dayStr).length;
+    const count = sessions.filter(s => 
+      new Date(s.date).toDateString() === dayStr && s.completed
+    ).length;
     const dayOfWeek = (date.getDay() + 1) % 7;
     result.push({ day: days[dayOfWeek], sessions: count });
   }

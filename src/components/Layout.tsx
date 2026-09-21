@@ -30,38 +30,42 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className={`min-h-screen flex flex-col theme-transition ${
       isDark 
         ? 'bg-gradient-to-br from-[#0a0a15] via-[#0d0d1a] to-[#0a0a15]' 
-        : 'bg-gradient-to-br from-[#f8fafc] via-[#ffffff] to-[#f1f5f9]'
+        : 'bg-gradient-to-br from-[#f0fdfa] via-[#ffffff] to-[#ecfdf5]'
     }`}>
       {/* Header - Fixed */}
       <header className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-lg border-b shadow-lg theme-transition ${
         isDark 
           ? 'bg-gradient-to-l from-[#1a1a2e]/95 to-[#16213e]/95 border-[#d4af37]/20 shadow-black/20' 
-          : 'bg-white/95 border-gray-200 shadow-gray-200/50'
+          : 'bg-white/95 border-[#14b8a6]/20 shadow-[#14b8a6]/10'
       }`}>
         <div className="px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setMenuOpen(!menuOpen)}
               className={`lg:hidden p-2 rounded-lg transition-all ${
-                isDark ? 'text-[#d4af37] hover:bg-[#d4af37]/10' : 'text-[#b8941f] hover:bg-[#d4af37]/10'
+                isDark ? 'text-[#d4af37] hover:bg-[#d4af37]/10' : 'text-[#0d9488] hover:bg-[#14b8a6]/10'
               }`}
             >
               {menuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#d4af37] to-[#f0d060] flex items-center justify-center shadow-lg shadow-[#d4af37]/30">
-                  <Dumbbell size={20} className="text-[#0d0d1a]" />
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ${
+                  isDark 
+                    ? 'bg-gradient-to-br from-[#d4af37] to-[#f0d060] shadow-[#d4af37]/30' 
+                    : 'bg-gradient-to-br from-[#14b8a6] to-[#0d9488] shadow-[#14b8a6]/30'
+                }`}>
+                  <Dumbbell size={20} className={isDark ? 'text-[#0d0d1a]' : 'text-white'} />
                 </div>
                 <div className="absolute -bottom-0.5 -left-0.5 w-3 h-3 bg-[#22c55e] rounded-full border-2 border-white dark:border-[#1a1a2e]" />
               </div>
               <div>
                 <h1 className={`font-bold text-base sm:text-lg leading-tight ${
-                  isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'
+                  isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'
                 }`}>
                   دستیار هوشمند بدنسازی
                 </h1>
-                <p className={`text-[10px] sm:text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                <p className={`text-[10px] sm:text-xs ${isDark ? 'text-gray-500' : 'text-[#0f766e]/70'}`}>
                   {getPersianDate()}
                 </p>
               </div>
@@ -75,7 +79,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               className={`p-2 rounded-xl transition-all ${
                 isDark 
                   ? 'bg-[#0d0d1a]/50 border border-[#d4af37]/20 text-[#d4af37] hover:bg-[#d4af37]/10' 
-                  : 'bg-gray-100 border border-gray-200 text-[#b8941f] hover:bg-gray-200'
+                  : 'bg-[#f0fdfa] border border-[#14b8a6]/30 text-[#0d9488] hover:bg-[#ccfbf1]'
               }`}
               title={isDark ? 'تم روشن' : 'تم تاریک'}
             >
@@ -85,10 +89,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border theme-transition ${
               isDark 
                 ? 'bg-[#0d0d1a]/50 border-[#d4af37]/20' 
-                : 'bg-gray-100 border-gray-200'
+                : 'bg-[#f0fdfa] border-[#14b8a6]/30'
             }`}>
               <div className="w-1.5 h-1.5 rounded-full bg-[#22c55e] animate-pulse" />
-              <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#0f766e]'}`}>
                 نسخه {toPersianNumber('1.0')}
               </span>
             </div>
@@ -104,11 +108,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <aside className={`hidden lg:flex flex-col w-60 backdrop-blur-sm border-l p-4 gap-1 sticky top-[68px] h-[calc(100vh-68px)] overflow-y-auto theme-transition ${
           isDark 
             ? 'bg-[#1a1a2e]/50 border-[#d4af37]/10' 
-            : 'bg-white/50 border-gray-200'
+            : 'bg-white/50 border-[#14b8a6]/10'
         }`}>
           <div className="mb-4 px-3">
             <p className={`text-xs font-bold uppercase tracking-wider ${
-              isDark ? 'text-gray-500' : 'text-gray-500'
+              isDark ? 'text-gray-500' : 'text-[#0f766e]/70'
             }`}>
               منوی اصلی
             </p>
@@ -124,20 +128,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   isActive 
                     ? isDark
                       ? 'bg-gradient-to-l from-[#d4af37]/20 via-[#d4af37]/10 to-transparent text-[#d4af37] font-bold'
-                      : 'bg-gradient-to-l from-[#d4af37]/20 via-[#d4af37]/10 to-transparent text-[#b8941f] font-bold'
+                      : 'bg-gradient-to-l from-[#14b8a6]/15 via-[#14b8a6]/5 to-transparent text-[#0d9488] font-bold'
                     : isDark
                       ? 'text-gray-400 hover:text-white hover:bg-white/5'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      : 'text-[#0f766e]/70 hover:text-[#0d9488] hover:bg-[#f0fdfa]'
                 }`}
               >
                 {isActive && (
                   <div className={`absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-l-full ${
-                    isDark ? 'bg-[#d4af37]' : 'bg-[#b8941f]'
+                    isDark ? 'bg-[#d4af37]' : 'bg-[#14b8a6]'
                   }`} />
                 )}
                 <div className={`p-1.5 rounded-lg transition-all ${
                   isActive 
-                    ? isDark ? 'bg-[#d4af37]/20' : 'bg-[#d4af37]/20'
+                    ? isDark ? 'bg-[#d4af37]/20' : 'bg-[#14b8a6]/15'
                     : 'group-hover:bg-white/5'
                 }`}>
                   <Icon size={18} />
@@ -148,17 +152,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           })}
           
           <div className={`mt-auto pt-4 border-t theme-transition ${
-            isDark ? 'border-[#d4af37]/10' : 'border-gray-200'
+            isDark ? 'border-[#d4af37]/10' : 'border-[#14b8a6]/10'
           }`}>
             <div className={`rounded-xl p-3 ${
               isDark 
                 ? 'bg-gradient-to-l from-[#d4af37]/10 to-transparent' 
-                : 'bg-gradient-to-l from-[#d4af37]/10 to-transparent'
+                : 'bg-gradient-to-l from-[#f0fdfa] to-[#ccfbf1]/50'
             }`}>
-              <p className={`text-xs font-bold mb-1 ${isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'}`}>
+              <p className={`text-xs font-bold mb-1 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
                 💡 نکته
               </p>
-              <p className={`text-[11px] leading-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              <p className={`text-[11px] leading-5 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/80'}`}>
                 برای شروع، پروفایل خود را تکمیل کنید
               </p>
             </div>
@@ -172,21 +176,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               className={`w-72 h-full p-5 flex flex-col gap-1 shadow-2xl theme-transition ${
                 isDark 
                   ? 'bg-gradient-to-b from-[#1a1a2e] to-[#0d0d1a]' 
-                  : 'bg-gradient-to-b from-white to-gray-50'
+                  : 'bg-gradient-to-b from-white to-[#f0fdfa]'
               }`}
               onClick={e => e.stopPropagation()}
             >
               <div className={`flex items-center gap-3 mb-6 pb-5 border-b theme-transition ${
-                isDark ? 'border-[#d4af37]/20' : 'border-gray-200'
+                isDark ? 'border-[#d4af37]/20' : 'border-[#14b8a6]/20'
               }`}>
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#d4af37] to-[#f0d060] flex items-center justify-center shadow-lg shadow-[#d4af37]/30">
-                  <Dumbbell size={24} className="text-[#0d0d1a]" />
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${
+                  isDark 
+                    ? 'bg-gradient-to-br from-[#d4af37] to-[#f0d060] shadow-[#d4af37]/30' 
+                    : 'bg-gradient-to-br from-[#14b8a6] to-[#0d9488] shadow-[#14b8a6]/30'
+                }`}>
+                  <Dumbbell size={24} className={isDark ? 'text-[#0d0d1a]' : 'text-white'} />
                 </div>
                 <div>
-                  <span className={`font-bold text-lg block ${isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'}`}>
+                  <span className={`font-bold text-lg block ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
                     AI Fitness
                   </span>
-                  <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                  <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-[#0f766e]/70'}`}>
                     Coach Assistant
                   </span>
                 </div>
@@ -202,10 +210,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       isActive 
                         ? isDark
                           ? 'bg-gradient-to-l from-[#d4af37]/20 to-transparent text-[#d4af37] font-bold'
-                          : 'bg-gradient-to-l from-[#d4af37]/20 to-transparent text-[#b8941f] font-bold'
+                          : 'bg-gradient-to-l from-[#14b8a6]/15 to-transparent text-[#0d9488] font-bold'
                         : isDark
                           ? 'text-gray-300 hover:text-white hover:bg-white/5'
-                          : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                          : 'text-[#0f766e]/70 hover:text-[#0d9488] hover:bg-[#f0fdfa]'
                     }`}
                   >
                     <Icon size={20} />
@@ -231,7 +239,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <nav className={`lg:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-lg border-t shadow-2xl theme-transition ${
         isDark 
           ? 'bg-gradient-to-t from-[#0d0d1a] via-[#1a1a2e]/98 to-[#1a1a2e]/95 border-[#d4af37]/20 shadow-black/50' 
-          : 'bg-gradient-to-t from-white via-white/98 to-white/95 border-gray-200 shadow-gray-300/50'
+          : 'bg-gradient-to-t from-white via-white/98 to-white/95 border-[#14b8a6]/20 shadow-[#14b8a6]/10'
       }`}>
         <div className="flex justify-around items-center py-2 px-1">
           {navItems.slice(0, 5).map(item => {
@@ -243,13 +251,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 onClick={() => navigate(item.path)}
                 className={`relative flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all ${
                   isActive 
-                    ? isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'
-                    : isDark ? 'text-gray-500 active:scale-95' : 'text-gray-400 active:scale-95'
+                    ? isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'
+                    : isDark ? 'text-gray-500 active:scale-95' : 'text-[#0f766e]/50 active:scale-95'
                 }`}
               >
                 {isActive && (
                   <div className={`absolute -top-2 w-8 h-1 rounded-b-full ${
-                    isDark ? 'bg-[#d4af37]' : 'bg-[#b8941f]'
+                    isDark ? 'bg-[#d4af37]' : 'bg-[#14b8a6]'
                   }`} />
                 )}
                 <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />

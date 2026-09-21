@@ -133,7 +133,7 @@ jobs:
           retention-days: 90
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v1
         with:
           files: release/*.apk
           name: "AI Fitness Coach v${{ env.VERSION }}"
@@ -159,11 +159,14 @@ jobs:
             - حجم: ~15 MB
             - معماری: Universal (ARM, ARM64, x86)
             
+            ### 📝 تغییرات این نسخه:
+            - انتشار اولیه
+            - تمام ویژگی‌های اصلی
+            
             ---
             **ساخته شده با ❤️ برای جامعه بدنسازی ایران**
           draft: false
           prerelease: false
-          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -23,6 +23,7 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Dark Theme (Default) */
 body {
   background-color: #0a0a15;
   color: #e2e8f0;
@@ -31,6 +32,13 @@ body {
   padding: 0;
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light Theme */
+[data-theme="light"] body {
+  background-color: #f8fafc;
+  color: #1e293b;
 }
 
 /* Custom Scrollbar */
@@ -48,8 +56,12 @@ body {
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #f0d060, #d4af37);
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #e2e8f0;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #b8941f, #d4af37);
 }
 
 /* Form Inputs */
@@ -117,22 +129,6 @@ input[type="number"]::-webkit-inner-spin-button {
   animation: scale-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes shimmer {
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
-}
-
-.animate-shimmer {
-  animation: shimmer 2s infinite linear;
-  background: linear-gradient(
-    to right,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  background-size: 1000px 100%;
-}
-
 /* Focus Styles */
 button:focus-visible,
 a:focus-visible,
@@ -149,19 +145,14 @@ textarea:focus-visible {
   color: #fff;
 }
 
+[data-theme="light"] ::selection {
+  background: rgba(212, 175, 55, 0.2);
+  color: #1e293b;
+}
+
 /* Smooth Transitions */
 button, a {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Card Hover Effect */
-.card-hover {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 }
 
 /* Gradient Text */
@@ -172,17 +163,7 @@ button, a {
   background-clip: text;
 }
 
-/* Glass Effect */
-.glass {
-  background: rgba(26, 26, 46, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(212, 175, 55, 0.1);
-}
-
-/* Responsive Text */
-@media (max-width: 640px) {
-  .responsive-title {
-    font-size: 1.25rem;
-  }
+/* Theme Transition */
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }

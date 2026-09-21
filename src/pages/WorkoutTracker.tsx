@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
+import { useTheme } from '../context/ThemeContext';
 import { WorkoutSession, SetRecord } from '../types';
 import { v4 as uuidv4 } from 'uuid';
-import { Dumbbell, Timer, Check, SkipForward, Trophy, X, AlertTriangle, Play, Pause, RotateCcw } from 'lucide-react';
+import { Dumbbell, Timer, Check, SkipForward, Trophy, X, AlertTriangle, Play } from 'lucide-react';
 import { toPersianNumber } from '../utils/jalali';
 
 export default function WorkoutTracker() {
   const { state, addSession, updateSession } = useAppContext();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const activeProgram = state.programs.find(p => p.id === state.activeProgram);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [session, setSession] = useState<WorkoutSession | null>(null);
@@ -152,11 +155,15 @@ export default function WorkoutTracker() {
   if (!activeProgram) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#d4af37]/20 to-transparent flex items-center justify-center mb-6">
-          <Dumbbell size={48} className="text-[#d4af37]" />
+        <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 ${
+          isDark ? 'bg-gradient-to-br from-[#d4af37]/20 to-transparent' : 'bg-gradient-to-br from-[#d4af37]/10 to-transparent'
+        }`}>
+          <Dumbbell size={48} className={isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'} />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-3">برنامه‌ای فعال نیست</h2>
-        <p className="text-gray-400 text-center max-w-md leading-7">
+        <h2 className={`text-2xl font-bold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          برنامه‌ای فعال نیست
+        </h2>
+        <p className={`text-center max-w-md leading-7 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
           لطفاً ابتدا یک برنامه تمرینی در بخش «ورود برنامه» وارد و فعال کنید
         </p>
       </div>
@@ -167,44 +174,62 @@ export default function WorkoutTracker() {
   if (showCancelModal) {
     return (
       <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-slide-up">
-        <div className="bg-gradient-to-b from-[#1a1a2e] to-[#0d0d1a] rounded-2xl p-6 max-w-md w-full border border-[#ef4444]/30 shadow-2xl">
+        <div className={`rounded-2xl p-6 max-w-md w-full border shadow-2xl theme-transition ${
+          isDark 
+            ? 'bg-gradient-to-b from-[#1a1a2e] to-[#0d0d1a] border-[#ef4444]/30' 
+            : 'bg-white border-[#ef4444]/30'
+        }`}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 rounded-full bg-[#ef4444]/20 flex items-center justify-center">
               <AlertTriangle size={24} className="text-[#ef4444]" />
             </div>
             <div>
-              <h3 className="text-white font-bold text-lg">لغو جلسه تمرین</h3>
-              <p className="text-gray-400 text-sm">آیا مطمئن هستید؟</p>
+              <h3 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                لغو جلسه تمرین
+              </h3>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                آیا مطمئن هستید؟
+              </p>
             </div>
           </div>
           
-          <div className="bg-[#0d0d1a] rounded-xl p-4 mb-4 border border-gray-800">
+          <div className={`rounded-xl p-4 mb-4 border theme-transition ${
+            isDark ? 'bg-[#0d0d1a] border-gray-800' : 'bg-gray-50 border-gray-200'
+          }`}>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-400">مدت زمان تمرین:</span>
-                <span className="text-white font-bold">{formatTime(workoutTime)}</span>
+                <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>مدت زمان تمرین:</span>
+                <span className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  {formatTime(workoutTime)}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">ست‌های انجام شده:</span>
-                <span className="text-white font-bold">
+                <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>ست‌های انجام شده:</span>
+                <span className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                   {toPersianNumber(session?.sets.filter(s => s.completed).length || 0)} از {toPersianNumber(session?.sets.length || 0)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-400">حجم فعلی:</span>
-                <span className="text-[#d4af37] font-bold">{toPersianNumber(session?.totalVolume || 0)} kg</span>
+                <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>حجم فعلی:</span>
+                <span className={`font-bold ${isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'}`}>
+                  {toPersianNumber(session?.totalVolume || 0)} kg
+                </span>
               </div>
             </div>
           </div>
 
-          <p className="text-gray-300 text-sm mb-5 leading-6">
+          <p className={`text-sm mb-5 leading-6 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
             با لغو جلسه، اطلاعات ثبت شده تا این لحظه به عنوان «جلسه لغو شده» ذخیره می‌شود و در آمار شما محاسبه نخواهد شد.
           </p>
 
           <div className="flex gap-3">
             <button
               onClick={() => setShowCancelModal(false)}
-              className="flex-1 bg-gray-700 text-white py-3 rounded-xl font-bold hover:bg-gray-600 transition-all"
+              className={`flex-1 py-3 rounded-xl font-bold transition-all ${
+                isDark 
+                  ? 'bg-gray-700 text-white hover:bg-gray-600' 
+                  : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
+              }`}
             >
               ادامه تمرین
             </button>
@@ -224,13 +249,19 @@ export default function WorkoutTracker() {
   if (showCancelConfirm) {
     return (
       <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-slide-up">
-        <div className="bg-gradient-to-b from-[#1a1a2e] to-[#0d0d1a] rounded-2xl p-6 max-w-md w-full border border-[#ef4444]/50 shadow-2xl">
+        <div className={`rounded-2xl p-6 max-w-md w-full border shadow-2xl theme-transition ${
+          isDark 
+            ? 'bg-gradient-to-b from-[#1a1a2e] to-[#0d0d1a] border-[#ef4444]/50' 
+            : 'bg-white border-[#ef4444]/50'
+        }`}>
           <div className="text-center mb-5">
             <div className="w-16 h-16 rounded-full bg-[#ef4444]/20 flex items-center justify-center mx-auto mb-3">
               <AlertTriangle size={32} className="text-[#ef4444]" />
             </div>
-            <h3 className="text-white font-bold text-xl mb-2">تأیید نهایی لغو</h3>
-            <p className="text-gray-400 text-sm leading-6">
+            <h3 className={`font-bold text-xl mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              تأیید نهایی لغو
+            </h3>
+            <p className={`text-sm leading-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               آیا واقعاً می‌خواهید جلسه تمرین را لغو کنید؟ این عمل قابل بازگشت نیست.
             </p>
           </div>
@@ -238,7 +269,11 @@ export default function WorkoutTracker() {
           <div className="flex gap-3">
             <button
               onClick={() => setShowCancelConfirm(false)}
-              className="flex-1 bg-gray-700 text-white py-3 rounded-xl font-bold hover:bg-gray-600 transition-all"
+              className={`flex-1 py-3 rounded-xl font-bold transition-all ${
+                isDark 
+                  ? 'bg-gray-700 text-white hover:bg-gray-600' 
+                  : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
+              }`}
             >
               بازگشت
             </button>
@@ -258,7 +293,9 @@ export default function WorkoutTracker() {
     return (
       <div className="flex flex-col items-center justify-center py-10 animate-slide-up">
         <div className="relative mb-6">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#22c55e]/30 to-transparent flex items-center justify-center">
+          <div className={`w-24 h-24 rounded-full flex items-center justify-center ${
+            isDark ? 'bg-gradient-to-br from-[#22c55e]/30 to-transparent' : 'bg-gradient-to-br from-[#22c55e]/20 to-transparent'
+          }`}>
             <div className="w-16 h-16 rounded-full bg-[#22c55e]/20 flex items-center justify-center">
               <Trophy size={40} className="text-[#22c55e]" />
             </div>
@@ -267,22 +304,40 @@ export default function WorkoutTracker() {
             ✓
           </div>
         </div>
-        <h2 className="text-3xl font-bold text-white mb-2">آفرین! 🎉</h2>
-        <p className="text-gray-400 text-center mb-8">تمرین با موفقیت تکمیل شد</p>
+        <h2 className={`text-3xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          آفرین! 🎉
+        </h2>
+        <p className={`text-center mb-8 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+          تمرین با موفقیت تکمیل شد
+        </p>
         
-        <div className="bg-gradient-to-b from-[#1a1a2e] to-[#0d0d1a] rounded-2xl p-6 w-full max-w-sm border border-[#d4af37]/20 shadow-xl">
+        <div className={`rounded-2xl p-6 w-full max-w-sm border shadow-xl theme-transition ${
+          isDark 
+            ? 'bg-gradient-to-b from-[#1a1a2e] to-[#0d0d1a] border-[#d4af37]/20' 
+            : 'bg-white border-[#d4af37]/30'
+        }`}>
           <div className="space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-gray-800">
-              <span className="text-gray-400">مدت زمان</span>
-              <span className="text-white font-bold text-lg">{formatTime(workoutTime)}</span>
+            <div className={`flex justify-between items-center pb-3 border-b theme-transition ${
+              isDark ? 'border-gray-800' : 'border-gray-200'
+            }`}>
+              <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>مدت زمان</span>
+              <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                {formatTime(workoutTime)}
+              </span>
             </div>
-            <div className="flex justify-between items-center pb-3 border-b border-gray-800">
-              <span className="text-gray-400">ست‌های انجام شده</span>
-              <span className="text-white font-bold text-lg">{toPersianNumber(session?.sets.filter(s => s.completed).length || 0)}</span>
+            <div className={`flex justify-between items-center pb-3 border-b theme-transition ${
+              isDark ? 'border-gray-800' : 'border-gray-200'
+            }`}>
+              <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>ست‌های انجام شده</span>
+              <span className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                {toPersianNumber(session?.sets.filter(s => s.completed).length || 0)}
+              </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-gray-400">حجم کل</span>
-              <span className="text-[#d4af37] font-bold text-lg">{toPersianNumber(session?.totalVolume || 0)} kg</span>
+              <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>حجم کل</span>
+              <span className={`font-bold text-lg ${isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'}`}>
+                {toPersianNumber(session?.totalVolume || 0)} kg
+              </span>
             </div>
           </div>
         </div>
@@ -302,21 +357,31 @@ export default function WorkoutTracker() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-              <Dumbbell size={24} className="text-[#d4af37]" />
+            <h2 className={`text-2xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              <Dumbbell size={24} className={isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'} />
               شروع تمرین
             </h2>
-            <p className="text-gray-400 text-sm mt-1">روز تمرینی خود را انتخاب کنید</p>
+            <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              روز تمرینی خود را انتخاب کنید
+            </p>
           </div>
         </div>
 
         {/* Program Info */}
-        <div className="bg-gradient-to-l from-[#1a1a2e] to-[#16213e] rounded-2xl p-5 border border-[#d4af37]/20 shadow-lg">
+        <div className={`rounded-2xl p-5 border shadow-lg theme-transition ${
+          isDark 
+            ? 'bg-gradient-to-l from-[#1a1a2e] to-[#16213e] border-[#d4af37]/20' 
+            : 'bg-gradient-to-l from-white to-[#fef9e7] border-[#d4af37]/30'
+        }`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-xs mb-1">برنامه فعال</p>
-              <h3 className="text-white font-bold text-lg">{activeProgram.name}</h3>
-              <p className="text-gray-400 text-sm mt-1">{activeProgram.duration}</p>
+              <p className={`text-xs mb-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>برنامه فعال</p>
+              <h3 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                {activeProgram.name}
+              </h3>
+              <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                {activeProgram.duration}
+              </p>
             </div>
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#d4af37] to-[#f0d060] flex items-center justify-center shadow-lg shadow-[#d4af37]/30">
               <Dumbbell size={24} className="text-[#0d0d1a]" />
@@ -326,33 +391,45 @@ export default function WorkoutTracker() {
 
         {/* Day Selection */}
         <div className="space-y-3">
-          <h3 className="text-white font-bold text-lg">انتخاب روز تمرینی</h3>
+          <h3 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            انتخاب روز تمرینی
+          </h3>
           {activeProgram.days.map((day, index) => (
             <button
               key={day.id}
               onClick={() => setSelectedDayIndex(index)}
-              className={`w-full text-right rounded-2xl p-5 border transition-all ${
+              className={`w-full text-right rounded-2xl p-5 border transition-all theme-transition ${
                 selectedDayIndex === index 
-                  ? 'border-[#d4af37] bg-gradient-to-l from-[#d4af37]/10 to-transparent shadow-lg shadow-[#d4af37]/10' 
-                  : 'border-gray-800 bg-[#1a1a2e] hover:border-gray-600'
+                  ? isDark
+                    ? 'border-[#d4af37] bg-gradient-to-l from-[#d4af37]/10 to-transparent shadow-lg shadow-[#d4af37]/10'
+                    : 'border-[#d4af37] bg-gradient-to-l from-[#d4af37]/10 to-white shadow-lg shadow-[#d4af37]/10'
+                  : isDark
+                    ? 'border-gray-800 bg-[#1a1a2e] hover:border-gray-600'
+                    : 'border-gray-200 bg-white hover:border-gray-300'
               }`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
-                      selectedDayIndex === index ? 'bg-[#d4af37] text-[#0d0d1a]' : 'bg-gray-800 text-gray-400'
+                      selectedDayIndex === index 
+                        ? 'bg-[#d4af37] text-[#0d0d1a]' 
+                        : isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-600'
                     }`}>
                       {toPersianNumber(index + 1)}
                     </div>
-                    <h4 className="text-white font-bold">{day.day}</h4>
+                    <h4 className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                      {day.day}
+                    </h4>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {day.muscleGroups.map((mg, i) => (
-                      <span key={i} className="bg-[#4a90d9]/20 text-[#4a90d9] px-2.5 py-0.5 rounded-lg text-xs">{mg}</span>
+                      <span key={i} className="bg-[#4a90d9]/20 text-[#4a90d9] px-2.5 py-0.5 rounded-lg text-xs">
+                        {mg}
+                      </span>
                     ))}
                   </div>
-                  <p className="text-gray-500 text-xs mt-2">
+                  <p className={`text-xs mt-2 ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
                     {toPersianNumber(day.exercises.length)} تمرین • {toPersianNumber(day.exercises.reduce((acc, ex) => acc + ex.sets, 0))} ست
                   </p>
                 </div>
@@ -383,17 +460,23 @@ export default function WorkoutTracker() {
   return (
     <div className="space-y-4">
       {/* Workout Header */}
-      <div className="bg-gradient-to-l from-[#1a1a2e] to-[#16213e] rounded-2xl p-4 border border-[#d4af37]/20 shadow-lg sticky top-0 z-30">
+      <div className={`rounded-2xl p-4 border shadow-lg sticky top-0 z-30 theme-transition ${
+        isDark 
+          ? 'bg-gradient-to-l from-[#1a1a2e] to-[#16213e] border-[#d4af37]/20' 
+          : 'bg-gradient-to-l from-white to-[#fef9e7] border-[#d4af37]/30'
+      }`}>
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h3 className="text-white font-bold text-lg">{selectedDay?.day}</h3>
+            <h3 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              {selectedDay?.day}
+            </h3>
             <div className="flex items-center gap-3 mt-1">
-              <div className="flex items-center gap-1 text-gray-400 text-sm">
+              <div className={`flex items-center gap-1 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 <Timer size={14} />
                 <span className="font-mono">{formatTime(workoutTime)}</span>
               </div>
-              <span className="text-gray-600">•</span>
-              <span className="text-gray-400 text-sm">
+              <span className={isDark ? 'text-gray-600' : 'text-gray-400'}>•</span>
+              <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 {toPersianNumber(completedSetsCount)} / {toPersianNumber(totalSetsCount)} ست
               </span>
             </div>
@@ -418,7 +501,9 @@ export default function WorkoutTracker() {
         </div>
         
         {/* Progress Bar */}
-        <div className="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+        <div className={`w-full h-2 rounded-full overflow-hidden theme-transition ${
+          isDark ? 'bg-gray-800' : 'bg-gray-200'
+        }`}>
           <div 
             className="h-full bg-gradient-to-l from-[#d4af37] to-[#22c55e] rounded-full transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
@@ -458,30 +543,42 @@ export default function WorkoutTracker() {
         const exerciseTotal = exerciseSets.length;
         
         return (
-          <div key={exercise.id} className="bg-gradient-to-b from-[#1a1a2e] to-[#16213e] rounded-2xl p-5 border border-gray-800 shadow-lg">
+          <div key={exercise.id} className={`rounded-2xl p-5 border shadow-lg theme-transition ${
+            isDark 
+              ? 'bg-gradient-to-b from-[#1a1a2e] to-[#16213e] border-gray-800' 
+              : 'bg-gradient-to-b from-white to-[#fef9e7] border-gray-200'
+          }`}>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h4 className="text-white font-bold text-lg">{exercise.name}</h4>
+                <h4 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  {exercise.name}
+                </h4>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[#d4af37] text-xs font-bold">
+                  <span className={`text-xs font-bold ${isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'}`}>
                     {toPersianNumber(exerciseCompleted)}/{toPersianNumber(exerciseTotal)}
                   </span>
-                  <span className="text-gray-500 text-xs">•</span>
-                  <span className="text-gray-400 text-xs">
+                  <span className={isDark ? 'text-gray-500 text-xs' : 'text-gray-400 text-xs'}>•</span>
+                  <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     {toPersianNumber(exercise.sets)}×{exercise.reps}
                   </span>
                 </div>
               </div>
               <div className="text-left">
-                <span className="text-gray-400 text-xs block">استراحت</span>
-                <span className="text-white font-bold text-sm">{toPersianNumber(exercise.rest)}ث</span>
+                <span className={`text-xs block ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>استراحت</span>
+                <span className={`font-bold text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  {toPersianNumber(exercise.rest)}ث
+                </span>
               </div>
             </div>
             
             {exercise.tempo && (
-              <div className="bg-[#0d0d1a] rounded-lg px-3 py-1.5 mb-3 inline-block">
-                <span className="text-gray-400 text-xs">تمپو: </span>
-                <span className="text-[#d4af37] text-xs font-mono">{exercise.tempo}</span>
+              <div className={`rounded-lg px-3 py-1.5 mb-3 inline-block theme-transition ${
+                isDark ? 'bg-[#0d0d1a]' : 'bg-gray-100'
+              }`}>
+                <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>تمپو: </span>
+                <span className={`text-xs font-mono ${isDark ? 'text-[#d4af37]' : 'text-[#b8941f]'}`}>
+                  {exercise.tempo}
+                </span>
               </div>
             )}
             
@@ -495,14 +592,19 @@ export default function WorkoutTracker() {
                     index={globalIdx}
                     onComplete={completeSet}
                     onSkip={skipSet}
+                    isDark={isDark}
                   />
                 );
               })}
             </div>
             
             {exercise.notes && (
-              <div className="mt-3 pt-3 border-t border-gray-800">
-                <p className="text-gray-400 text-xs">📝 {exercise.notes}</p>
+              <div className={`mt-3 pt-3 border-t theme-transition ${
+                isDark ? 'border-gray-800' : 'border-gray-200'
+              }`}>
+                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                  📝 {exercise.notes}
+                </p>
               </div>
             )}
           </div>
@@ -512,23 +614,30 @@ export default function WorkoutTracker() {
   );
 }
 
-function SetRow({ set, index, onComplete, onSkip }: { 
+function SetRow({ set, index, onComplete, onSkip, isDark }: { 
   set: SetRecord; 
   index: number; 
   onComplete: (index: number, weight?: number, reps?: number) => void;
   onSkip: (index: number) => void;
+  isDark: boolean;
 }) {
   const [weight, setWeight] = useState(set.actualWeight || '');
   const [reps, setReps] = useState(set.actualReps || '');
 
   if (set.completed) {
     return (
-      <div className="flex items-center gap-3 bg-[#22c55e]/5 border border-[#22c55e]/20 rounded-xl px-4 py-3">
+      <div className={`flex items-center gap-3 rounded-xl px-4 py-3 theme-transition ${
+        isDark 
+          ? 'bg-[#22c55e]/5 border border-[#22c55e]/20' 
+          : 'bg-[#22c55e]/10 border border-[#22c55e]/30'
+      }`}>
         <div className="w-7 h-7 rounded-full bg-[#22c55e]/20 flex items-center justify-center">
           <Check size={14} className="text-[#22c55e]" />
         </div>
         <div className="flex-1">
-          <span className="text-gray-400 text-xs">ست {toPersianNumber(set.setNumber)}</span>
+          <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            ست {toPersianNumber(set.setNumber)}
+          </span>
           <div className="text-[#22c55e] text-sm font-bold">
             {set.actualWeight ? `${toPersianNumber(set.actualWeight)} kg` : '-'} × {set.actualReps ? toPersianNumber(set.actualReps) : set.targetReps}
           </div>
@@ -538,8 +647,14 @@ function SetRow({ set, index, onComplete, onSkip }: {
   }
 
   return (
-    <div className="flex items-center gap-2 bg-[#0d0d1a] rounded-xl px-3 py-3 border border-gray-800">
-      <div className="w-7 h-7 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 text-xs font-bold">
+    <div className={`flex items-center gap-2 rounded-xl px-3 py-3 border theme-transition ${
+      isDark 
+        ? 'bg-[#0d0d1a] border-gray-800' 
+        : 'bg-white border-gray-200'
+    }`}>
+      <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold theme-transition ${
+        isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-200 text-gray-600'
+      }`}>
         {toPersianNumber(set.setNumber)}
       </div>
       <input
@@ -547,16 +662,24 @@ function SetRow({ set, index, onComplete, onSkip }: {
         value={weight}
         onChange={e => setWeight(e.target.value as any)}
         placeholder="وزن"
-        className="w-16 bg-[#1a1a2e] border border-gray-700 rounded-lg px-2 py-1.5 text-white text-xs text-center focus:border-[#d4af37] focus:outline-none"
+        className={`w-16 border rounded-lg px-2 py-1.5 text-xs text-center focus:border-[#d4af37] focus:outline-none theme-transition ${
+          isDark 
+            ? 'bg-[#1a1a2e] border-gray-700 text-white' 
+            : 'bg-gray-50 border-gray-300 text-gray-900'
+        }`}
         dir="ltr"
       />
-      <span className="text-gray-500 text-xs">×</span>
+      <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>×</span>
       <input
         type="number"
         value={reps}
         onChange={e => setReps(e.target.value as any)}
         placeholder="تکرار"
-        className="w-14 bg-[#1a1a2e] border border-gray-700 rounded-lg px-2 py-1.5 text-white text-xs text-center focus:border-[#d4af37] focus:outline-none"
+        className={`w-14 border rounded-lg px-2 py-1.5 text-xs text-center focus:border-[#d4af37] focus:outline-none theme-transition ${
+          isDark 
+            ? 'bg-[#1a1a2e] border-gray-700 text-white' 
+            : 'bg-gray-50 border-gray-300 text-gray-900'
+        }`}
         dir="ltr"
       />
       <button
@@ -567,7 +690,11 @@ function SetRow({ set, index, onComplete, onSkip }: {
       </button>
       <button
         onClick={() => onSkip(index)}
-        className="text-gray-500 p-2 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
+        className={`p-2 rounded-lg transition-all theme-transition ${
+          isDark 
+            ? 'text-gray-500 hover:text-white hover:bg-gray-800' 
+            : 'text-gray-400 hover:text-gray-900 hover:bg-gray-200'
+        }`}
       >
         <SkipForward size={14} />
       </button>

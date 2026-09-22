@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
+import { useTheme } from '../context/ThemeContext';
 import { validateWorkoutJSON } from '../utils/promptGenerator';
-import { WorkoutProgram, WorkoutDay, Exercise } from '../types';
+import { WorkoutProgram } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { Import as ImportIcon, Check, AlertCircle, Trash2, Save, Eye } from 'lucide-react';
 import { toPersianNumber } from '../utils/jalali';
 
 export default function ProgramImport() {
-  const { state, activeProfile, addProgram, removeProgram, setActiveProgram } = useAppContext();
+  const { activeProfile, programs, addProgram, removeProgram, setActiveProgram, state } = useAppContext();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [jsonInput, setJsonInput] = useState('');
   const [validationResult, setValidationResult] = useState<{ valid: boolean; data?: any; error?: string } | null>(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -22,11 +25,12 @@ export default function ProgramImport() {
   };
 
   const handleImport = () => {
-    if (!validationResult?.valid || !validationResult.data) return;
-    
+    if (!validationResult?.valid || !validationResult.data || !activeProfile) return;
+
+    const programId = uuidv4();
     const program: WorkoutProgram = {
-      id: uuidv4(),
-      profileId: activeProfile!.id,
+      id: programId,
+      profileId: activeProfile.id,
       name: validationResult.data.program_name,
       duration: validationResult.data.duration,
       createdAt: new Date().toISOString(),
@@ -47,6 +51,7 @@ export default function ProgramImport() {
     };
 
     addProgram(program);
+    setActiveProgram(programId);
     setImported(true);
     setJsonInput('');
     setValidationResult(null);
@@ -83,111 +88,166 @@ export default function ProgramImport() {
     ]
   }, null, 2);
 
+  if (!activeProfile) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <AlertCircle size={48} className={isDark ? 'text-[#f59e0b]' : 'text-[#d97706]'} />
+        <h2 className={`text-xl font-bold mt-4 mb-2 ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+          پروفایل انتخاب نشده
+        </h2>
+        <p className={`text-center ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+          لطفاً ابتدا یک پروفایل را انتخاب کنید
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <h2 className="text-xl font-bold text-white flex items-center gap-2">
-        <ImportIcon size={22} className="text-[#22c55e]" />
+      <h2 className={`text-xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+        <ImportIcon size={22} className={isDark ? 'text-[#22c55e]' : 'text-[#059669]'} />
         ورود برنامه تمرینی
+        <span className={`text-sm font-normal ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+          — {activeProfile.name}
+        </span>
       </h2>
 
-      {/* Success Message */}
       {imported && (
-        <div className="bg-[#22c55e]/20 border border-[#22c55e]/30 rounded-xl p-4 flex items-center gap-3 animate-slide-up">
-          <Check size={20} className="text-[#22c55e]" />
-          <span className="text-[#22c55e] font-bold">برنامه با موفقیت وارد شد!</span>
+        <div className={`rounded-xl p-4 flex items-center gap-3 animate-slide-up ${
+          isDark ? 'bg-[#22c55e]/20 border border-[#22c55e]/30' : 'bg-[#10b981]/15 border border-[#10b981]/30'
+        }`}>
+          <Check size={20} className={isDark ? 'text-[#22c55e]' : 'text-[#059669]'} />
+          <span className={`font-bold ${isDark ? 'text-[#22c55e]' : 'text-[#059669]'}`}>
+            برنامه با موفقیت وارد شد و فعال شد!
+          </span>
         </div>
       )}
 
-      {/* Input Section */}
-      <div className="bg-[#1a1a2e] rounded-2xl p-5 border border-[#d4af37]/10">
-        <h3 className="text-[#d4af37] font-bold mb-3">JSON برنامه تمرینی</h3>
-        <p className="text-gray-400 text-sm mb-3">
+      <div className={`rounded-2xl p-5 border theme-transition ${
+        isDark ? 'bg-[#1a1a2e] border-[#d4af37]/10' : 'bg-white border-[#14b8a6]/15'
+      }`}>
+        <h3 className={`font-bold mb-3 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+          JSON برنامه تمرینی
+        </h3>
+        <p className={`text-sm mb-3 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
           خروجی هوش مصنوعی را در قالب JSON وارد کنید:
         </p>
         <textarea
           value={jsonInput}
           onChange={e => { setJsonInput(e.target.value); setValidationResult(null); setShowPreview(false); }}
-          className="w-full bg-[#0d0d1a] border border-gray-700 rounded-xl px-4 py-3 text-white text-sm font-mono focus:border-[#d4af37] focus:outline-none resize-none"
+          className={`w-full border rounded-xl px-4 py-3 text-sm font-mono focus:outline-none resize-none ${
+            isDark
+              ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]'
+              : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]'
+          }`}
           rows={10}
           dir="ltr"
           placeholder='{"program_name": "...", "days": [...]}'
         />
-        
+
         <div className="flex gap-3 mt-4">
           <button
             onClick={handleValidate}
             disabled={!jsonInput.trim()}
-            className="flex items-center gap-2 bg-[#4a90d9] text-white px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-[#6bb5ff] disabled:opacity-50 transition-all"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all ${
+              isDark
+                ? 'bg-[#4a90d9] text-white hover:bg-[#6bb5ff] disabled:opacity-50'
+                : 'bg-[#14b8a6] text-white hover:bg-[#0d9488] disabled:opacity-50'
+            }`}
           >
             <Eye size={16} />
             اعتبارسنجی و پیش‌نمایش
           </button>
           <button
             onClick={() => setJsonInput(sampleJSON)}
-            className="flex items-center gap-2 bg-gray-700 text-white px-4 py-2.5 rounded-xl text-sm hover:bg-gray-600 transition-all"
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm transition-all ${
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
           >
             نمونه JSON
           </button>
         </div>
       </div>
 
-      {/* Validation Result */}
       {validationResult && !validationResult.valid && (
-        <div className="bg-[#ef4444]/10 border border-[#ef4444]/30 rounded-xl p-4 flex items-start gap-3">
-          <AlertCircle size={20} className="text-[#ef4444] mt-0.5" />
+        <div className={`rounded-xl p-4 flex items-start gap-3 ${
+          isDark ? 'bg-[#ef4444]/10 border border-[#ef4444]/30' : 'bg-red-50 border border-red-200'
+        }`}>
+          <AlertCircle size={20} className={isDark ? 'text-[#ef4444]' : 'text-[#dc2626]'} />
           <div>
-            <p className="text-[#ef4444] font-bold">خطا در اعتبارسنجی</p>
-            <p className="text-gray-400 text-sm mt-1">{validationResult.error}</p>
+            <p className={`font-bold ${isDark ? 'text-[#ef4444]' : 'text-[#dc2626]'}`}>خطا در اعتبارسنجی</p>
+            <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+              {validationResult.error}
+            </p>
           </div>
         </div>
       )}
 
-      {/* Preview */}
       {showPreview && validationResult?.valid && (
-        <div className="bg-[#1a1a2e] rounded-2xl p-5 border border-[#22c55e]/20 animate-slide-up">
+        <div className={`rounded-2xl p-5 border animate-slide-up ${
+          isDark ? 'bg-[#1a1a2e] border-[#22c55e]/20' : 'bg-white border-[#10b981]/30'
+        }`}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[#22c55e] font-bold flex items-center gap-2">
+            <h3 className={`font-bold flex items-center gap-2 ${isDark ? 'text-[#22c55e]' : 'text-[#059669]'}`}>
               <Check size={18} />
               پیش‌نمایش برنامه
             </h3>
             <button
               onClick={handleImport}
-              className="flex items-center gap-2 bg-[#22c55e] text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-[#16a34a] transition-all"
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
+                isDark
+                  ? 'bg-[#22c55e] text-white hover:bg-[#16a34a]'
+                  : 'bg-[#10b981] text-white hover:bg-[#059669]'
+              }`}
             >
               <Save size={16} />
               ذخیره برنامه
             </button>
           </div>
-          
+
           <div className="space-y-4">
             <div className="flex items-center gap-4 text-sm">
-              <span className="text-gray-400">نام برنامه:</span>
-              <span className="text-white font-bold">{validationResult.data.program_name}</span>
+              <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>نام برنامه:</span>
+              <span className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+                {validationResult.data.program_name}
+              </span>
             </div>
             <div className="flex items-center gap-4 text-sm">
-              <span className="text-gray-400">مدت:</span>
-              <span className="text-white">{validationResult.data.duration}</span>
+              <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>مدت:</span>
+              <span className={isDark ? 'text-white' : 'text-[#134e4a]'}>
+                {validationResult.data.duration}
+              </span>
             </div>
             <div className="flex items-center gap-4 text-sm">
-              <span className="text-gray-400">تعداد روزها:</span>
-              <span className="text-white">{toPersianNumber(validationResult.data.days.length)} روز</span>
+              <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>تعداد روزها:</span>
+              <span className={isDark ? 'text-white' : 'text-[#134e4a]'}>
+                {toPersianNumber(validationResult.data.days.length)} روز
+              </span>
             </div>
 
-            <div className="border-t border-gray-700 pt-4 mt-4">
+            <div className={`border-t pt-4 mt-4 ${isDark ? 'border-gray-700' : 'border-[#14b8a6]/20'}`}>
               {validationResult.data.days.map((day: any, i: number) => (
-                <div key={i} className="mb-4 bg-[#0d0d1a] rounded-xl p-4">
-                  <h4 className="text-[#d4af37] font-bold mb-2">{day.day}</h4>
+                <div key={i} className={`mb-4 rounded-xl p-4 ${
+                  isDark ? 'bg-[#0d0d1a]' : 'bg-[#f0fdfa]'
+                }`}>
+                  <h4 className={`font-bold mb-2 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+                    {day.day}
+                  </h4>
                   <div className="flex flex-wrap gap-1 mb-3">
                     {(day.muscle_groups || []).map((mg: string, j: number) => (
-                      <span key={j} className="bg-[#4a90d9]/20 text-[#4a90d9] px-2 py-0.5 rounded text-xs">{mg}</span>
+                      <span key={j} className={`px-2 py-0.5 rounded text-xs ${\n                        isDark ? 'bg-[#4a90d9]/20 text-[#4a90d9]' : 'bg-[#14b8a6]/15 text-[#0d9488]'
+                      }`}>{mg}</span>
                     ))}
                   </div>
                   <div className="space-y-2">
                     {(day.exercises || []).map((ex: any, k: number) => (
-                      <div key={k} className="flex items-center justify-between text-sm border-b border-gray-800 pb-2">
-                        <span className="text-white">{ex.name}</span>
-                        <span className="text-gray-400">
+                      <div key={k} className={`flex items-center justify-between text-sm border-b pb-2 ${
+                        isDark ? 'border-gray-800' : 'border-[#14b8a6]/10'
+                      }`}>
+                        <span className={isDark ? 'text-white' : 'text-[#134e4a]'}>{ex.name}</span>
+                        <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>
                           {toPersianNumber(ex.sets)}×{ex.reps} | استراحت: {toPersianNumber(ex.rest)}ث
                         </span>
                       </div>
@@ -200,38 +260,64 @@ export default function ProgramImport() {
         </div>
       )}
 
-      {/* Saved Programs */}
-      {state.programs.length > 0 && (
-        <div className="bg-[#1a1a2e] rounded-2xl p-5 border border-[#d4af37]/10">
-          <h3 className="text-[#d4af37] font-bold mb-4">برنامه‌های ذخیره شده</h3>
+      {/* Saved Programs — only for active profile */}
+      <div className={`rounded-2xl p-5 border theme-transition ${
+        isDark ? 'bg-[#1a1a2e] border-[#d4af37]/10' : 'bg-white border-[#14b8a6]/15'
+      }`}>
+        <h3 className={`font-bold mb-4 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+          برنامه‌های ذخیره شده ({activeProfile.name})
+        </h3>
+        {programs.length === 0 ? (
+          <p className={`text-sm text-center py-4 ${isDark ? 'text-gray-500' : 'text-[#0f766e]/50'}`}>
+            هنوز برنامه تمرینی برای این پروفایل وارد نشده است
+          </p>
+        ) : (
           <div className="space-y-3">
-            {state.programs.map(program => (
+            {programs.map(program => (
               <div
                 key={program.id}
-                className={`bg-[#0d0d1a] rounded-xl p-4 border ${
-                  state.activeProgram === program.id ? 'border-[#22c55e]/50' : 'border-gray-800'
+                className={`rounded-xl p-4 border ${
+                  state.activeProgram === program.id
+                    ? isDark
+                      ? 'bg-[#0d0d1a] border-[#22c55e]/50'
+                      : 'bg-[#f0fdfa] border-[#10b981]/40'
+                    : isDark
+                      ? 'bg-[#0d0d1a] border-gray-800'
+                      : 'bg-[#f0fdfa] border-[#14b8a6]/20'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-white font-bold">{program.name}</h4>
-                    <p className="text-gray-400 text-sm mt-1">
+                    <h4 className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+                      {program.name}
+                    </h4>
+                    <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
                       {program.duration} • {toPersianNumber(program.days.length)} روز • {toPersianNumber(program.days.reduce((acc, d) => acc + d.exercises.length, 0))} تمرین
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
                     {state.activeProgram === program.id ? (
-                      <span className="text-xs bg-[#22c55e]/20 text-[#22c55e] px-2 py-1 rounded-full">فعال</span>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        isDark ? 'bg-[#22c55e]/20 text-[#22c55e]' : 'bg-[#10b981]/15 text-[#059669]'
+                      }`}>
+                        فعال
+                      </span>
                     ) : (
                       <button
                         onClick={() => setActiveProgram(program.id)}
-                        className="text-xs bg-[#4a90d9]/20 text-[#4a90d9] px-3 py-1 rounded-full hover:bg-[#4a90d9]/30"
+                        className={`text-xs px-3 py-1 rounded-full transition-all ${
+                          isDark
+                            ? 'bg-[#4a90d9]/20 text-[#4a90d9] hover:bg-[#4a90d9]/30'
+                            : 'bg-[#14b8a6]/15 text-[#0d9488] hover:bg-[#14b8a6]/25'
+                        }`}
                       >
                         فعال‌سازی
                       </button>
                     )}
                     <button
-                      onClick={() => removeProgram(program.id)}
+                      onClick={() => {
+                        if (confirm('آیا مطمئن هستید؟')) removeProgram(program.id);
+                      }}
                       className="text-[#ef4444] p-1 hover:bg-[#ef4444]/10 rounded"
                     >
                       <Trash2 size={16} />
@@ -241,8 +327,8 @@ export default function ProgramImport() {
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

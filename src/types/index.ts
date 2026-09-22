@@ -69,6 +69,71 @@ export interface WorkoutProgram {
   days: WorkoutDay[];
 }
 
+export interface NutritionProgram {
+  id: string;
+  profileId: string;
+  plan_name: string;
+  duration: string;
+  daily_calories: number;
+  macros: {
+    protein: number;
+    carbs: number;
+    fats: number;
+  };
+  days: NutritionDay[];
+  hydration: string;
+  supplements?: string;
+  createdAt: string;
+}
+
+export interface NutritionDay {
+  day: string;
+  meals: Meal[];
+  total_calories: number;
+  notes?: string;
+}
+
+export interface Meal {
+  meal_name: string;
+  time: string;
+  foods: Food[];
+  preparation?: string;
+}
+
+export interface Food {
+  name: string;
+  portion: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fats: number;
+}
+
+export interface SupplementProgram {
+  id: string;
+  profileId: string;
+  recommendation_title: string;
+  summary: string;
+  supplements: Supplement[];
+  total_estimated_cost: string;
+  important_notes: string;
+  warnings: string;
+  createdAt: string;
+}
+
+export interface Supplement {
+  name: string;
+  english_name: string;
+  priority: string;
+  dosage: string;
+  timing: string;
+  benefits: string;
+  side_effects: string;
+  estimated_cost: string;
+  recommended_brands: string;
+  notes: string;
+}
+
 export interface WorkoutDay {
   id: string;
   day: string;
@@ -126,9 +191,13 @@ export interface AppState {
   profiles: AthleteProfile[];
   activeProfileId: string | null;
   programs: WorkoutProgram[];
+  nutritionPrograms: NutritionProgram[];
+  supplementPrograms: SupplementProgram[];
   sessions: WorkoutSession[];
   progress: ProgressEntry[];
   activeProgram: string | null;
+  activeNutritionProgram: string | null;
+  activeSupplementProgram: string | null;
 }
 
 export const GOAL_LABELS: Record<Goal, string> = {
@@ -152,15 +221,15 @@ export const EXPERIENCE_LABELS: Record<string, string> = {
 };
 
 export const EQUIPMENT_OPTIONS = [
-  'Barbell', 'Dumbbell', 'Cable Machine', 'Smith Machine', 'Lat Pulldown',
-  'Low Cable', 'High Cable', 'Bench', 'Pull-up Bar', 'Dip Station',
-  'Kettlebell', 'TRX', 'Resistance Bands', 'Bodyweight', 'Leg Press',
-  'Chest Press Machine', 'Weight Plates', 'Adjustable Dumbbells'
+  'هالتر', 'دمبل', 'دستگاه سیم‌کش', 'دستگاه اسمیت', 'زیربغل سیم‌کش',
+  'سیم‌کش پایین', 'سیم‌کش بالا', 'نیمکت', 'میله بارفیکس', 'پارالل',
+  'کتل‌بل', 'تی‌آرایکس', 'کش مقاومتی', 'وزن بدن', 'پرس پا',
+  'دستگاه پرس سینه', 'صفحه وزنه', 'دمبل متغیر'
 ];
 
 export const MUSCLE_GROUPS = [
-  'Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps',
-  'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Abs', 'Traps', 'Forearms'
+  'سینه', 'پشت', 'سرشانه', 'جلوبازو', 'پشت‌بازو',
+  'چهارسر ران', 'همسترینگ', 'باسن', 'ساق پا', 'شکم', 'کول', 'ساعد'
 ];
 
 export const PROGRAM_TYPES = {
@@ -192,15 +261,18 @@ export const DIET_TYPES = [
 ];
 
 export const IRANIAN_FOODS = [
-  'Chelo Kabab', 'Ghormeh Sabzi', 'Gheymeh', 'Tahchin',
-  'Ash Reshteh', 'Kuku Sabzi', 'Fesenjan', 'Zereshk Polo',
-  'Baghali Polo', 'Dizi', 'Abgoosht', 'Tahdig',
-  'Sangak Bread', 'Lavash', 'Rice', 'Lentil Stew',
-  'Yogurt', 'Doogh', 'Fresh Herbs', 'Walnuts'
+  'چلو کباب', 'قورمه‌سبزی', 'قیمه', 'ته‌چین',
+  'آش رشته', 'کوکو سبزی', 'فسنجان', 'زرشک‌پلو',
+  'باقالی‌پلو', 'دیزی', 'آبگوشت', 'ته‌دیگ',
+  'نان سنگک', 'نان لواش', 'برنج', 'عدس‌پلو',
+  'ماست', 'دوغ', 'سبزی خوردن', 'گردو',
+  'مرغ', 'ماهی', 'گوشت قرمز', 'تخم‌مرغ',
+  'لوبیا', 'نخود', 'لentils', 'سیب‌زمینی',
+  'گوجه‌فرنگی', 'خیار', 'پیاز', 'سیر'
 ];
 
 export const SUPPLEMENT_CATEGORIES = [
-  'Protein Powder', 'Creatine', 'BCAA', 'Pre-Workout',
-  'Multivitamin', 'Omega-3', 'Vitamin D', 'ZMA',
-  'Glutamine', 'Beta-Alanine', 'Citrulline', 'Caffeine'
+  'پودر پروتئین', 'کراتین', 'بی‌سی‌ای‌ای', 'پری‌ورک‌اوت',
+  'مولتی‌ویتامین', 'امگا ۳', 'ویتامین D', 'ZMA',
+  'گلوتامین', 'بتا-آلانین', 'سیترولین', 'کافئین'
 ];

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { AppState, AthleteProfile, WorkoutProgram, WorkoutSession, ProgressEntry } from '../types';
+import { AppState, AthleteProfile, WorkoutProgram, NutritionProgram, SupplementProgram, WorkoutSession, ProgressEntry } from '../types';
 import { loadState, saveState } from '../utils/storage';
 
 interface AppContextType {
@@ -10,12 +10,22 @@ interface AppContextType {
   setActiveProfile: (id: string | null) => void;
   saveProfile: (profile: AthleteProfile) => void;
   deleteProfile: (id: string) => void;
-  // Program management (filtered by active profile)
+  // Workout Program management (filtered by active profile)
   programs: WorkoutProgram[];
   addProgram: (program: WorkoutProgram) => void;
   updateProgram: (program: WorkoutProgram) => void;
   removeProgram: (id: string) => void;
   setActiveProgram: (id: string | null) => void;
+  // Nutrition Program management (filtered by active profile)
+  nutritionPrograms: NutritionProgram[];
+  addNutritionProgram: (program: NutritionProgram) => void;
+  removeNutritionProgram: (id: string) => void;
+  setActiveNutritionProgram: (id: string | null) => void;
+  // Supplement Program management (filtered by active profile)
+  supplementPrograms: SupplementProgram[];
+  addSupplementProgram: (program: SupplementProgram) => void;
+  removeSupplementProgram: (id: string) => void;
+  setActiveSupplementProgram: (id: string | null) => void;
   // Session management (filtered by active profile)
   sessions: WorkoutSession[];
   addSession: (session: WorkoutSession) => void;
@@ -85,6 +95,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ...prev,
         profiles: newProfiles,
         programs: prev.programs.filter(p => p.profileId !== id),
+        nutritionPrograms: prev.nutritionPrograms.filter(p => p.profileId !== id),
+        supplementPrograms: prev.supplementPrograms.filter(p => p.profileId !== id),
         sessions: prev.sessions.filter(s => s.profileId !== id),
         progress: prev.progress.filter(p => p.profileId !== id),
         activeProfileId: prev.activeProfileId === id 
@@ -93,11 +105,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         activeProgram: prev.programs.find(p => p.id === prev.activeProgram && p.profileId !== id) 
           ? prev.activeProgram 
           : null,
+        activeNutritionProgram: prev.nutritionPrograms.find(p => p.id === prev.activeNutritionProgram && p.profileId !== id)
+          ? prev.activeNutritionProgram
+          : null,
+        activeSupplementProgram: prev.supplementPrograms.find(p => p.id === prev.activeSupplementProgram && p.profileId !== id)
+          ? prev.activeSupplementProgram
+          : null,
       };
     });
   }, []);
 
-  // Program management
+  // Filtered data for active profile
+  const nutritionPrograms = useMemo(() => 
+    state.nutritionPrograms.filter(p => p.profileId === state.activeProfileId),
+    [state.nutritionPrograms, state.activeProfileId]
+  );
+
+  const supplementPrograms = useMemo(() => 
+    state.supplementPrograms.filter(p => p.profileId === state.activeProfileId),
+    [state.supplementPrograms, state.activeProfileId]
+  );
+
+  // Workout Program management
   const addProgram = useCallback((program: WorkoutProgram) => {
     setState(prev => ({ ...prev, programs: [...prev.programs, program] }));
   }, []);
@@ -119,6 +148,40 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const setActiveProgram = useCallback((id: string | null) => {
     setState(prev => ({ ...prev, activeProgram: id }));
+  }, []);
+
+  // Nutrition Program management
+  const addNutritionProgram = useCallback((program: NutritionProgram) => {
+    setState(prev => ({ ...prev, nutritionPrograms: [...prev.nutritionPrograms, program] }));
+  }, []);
+
+  const removeNutritionProgram = useCallback((id: string) => {
+    setState(prev => ({
+      ...prev,
+      nutritionPrograms: prev.nutritionPrograms.filter(p => p.id !== id),
+      activeNutritionProgram: prev.activeNutritionProgram === id ? null : prev.activeNutritionProgram
+    }));
+  }, []);
+
+  const setActiveNutritionProgram = useCallback((id: string | null) => {
+    setState(prev => ({ ...prev, activeNutritionProgram: id }));
+  }, []);
+
+  // Supplement Program management
+  const addSupplementProgram = useCallback((program: SupplementProgram) => {
+    setState(prev => ({ ...prev, supplementPrograms: [...prev.supplementPrograms, program] }));
+  }, []);
+
+  const removeSupplementProgram = useCallback((id: string) => {
+    setState(prev => ({
+      ...prev,
+      supplementPrograms: prev.supplementPrograms.filter(p => p.id !== id),
+      activeSupplementProgram: prev.activeSupplementProgram === id ? null : prev.activeSupplementProgram
+    }));
+  }, []);
+
+  const setActiveSupplementProgram = useCallback((id: string | null) => {
+    setState(prev => ({ ...prev, activeSupplementProgram: id }));
   }, []);
 
   // Session management
@@ -151,6 +214,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       updateProgram,
       removeProgram,
       setActiveProgram,
+      nutritionPrograms,
+      addNutritionProgram,
+      removeNutritionProgram,
+      setActiveNutritionProgram,
+      supplementPrograms,
+      addSupplementProgram,
+      removeSupplementProgram,
+      setActiveSupplementProgram,
       sessions,
       addSession,
       updateSession,

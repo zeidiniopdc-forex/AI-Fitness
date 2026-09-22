@@ -3,7 +3,7 @@ import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
 import { AthleteProfile, GOAL_LABELS, EXPERIENCE_LABELS, EQUIPMENT_OPTIONS, MUSCLE_GROUPS, PROGRAM_TYPES, ACTIVITY_LEVELS, EQUIPMENT_TYPES, DIET_TYPES, IRANIAN_FOODS, SUPPLEMENT_CATEGORIES, getGoalLabel } from '../types';
 import { v4 as uuidv4 } from 'uuid';
-import { User, Save, ChevronLeft, ChevronRight, Check, Plus, Trash2, Edit, Dumbbell, Apple, Pill } from 'lucide-react';
+import { User, Save, ChevronLeft, ChevronRight, Check, Plus, Trash2, Edit, Dumbbell, Apple, Pill, X } from 'lucide-react';
 import { toPersianNumber } from '../utils/jalali';
 
 const steps = ['اطلاعات پایه', 'اطلاعات تمرینی', 'تغذیه', 'مکمل‌ها', 'اهداف'];
@@ -577,11 +577,25 @@ function StepTraining({ form, setForm, toggleEquipment, isDark }: any) {
         {(form.customEquipment || []).length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
             {(form.customEquipment || []).map((item: string, idx: number) => (
-              <span key={idx} className={`px-3 py-1.5 rounded-lg text-xs ${
-                isDark ? 'bg-[#4a90d9]/20 text-[#6bb5ff]' : 'bg-[#14b8a6]/15 text-[#0d9488]'
-              }`}>
-                {item}
-              </span>
+              <div key={idx} className="flex items-center gap-1">
+                <span className={`px-3 py-1.5 rounded-lg text-xs ${
+                  isDark ? 'bg-[#4a90d9]/20 text-[#6bb5ff]' : 'bg-[#14b8a6]/15 text-[#0d9488]'
+                }`}>
+                  {item}
+                </span>
+                <button
+                  onClick={() => {
+                    const updated = (form.customEquipment || []).filter((_: string, i: number) => i !== idx);
+                    setForm({ ...form, customEquipment: updated });
+                  }}
+                  className={`p-1 rounded hover:bg-red-500/20 transition-all ${
+                    isDark ? 'text-red-400' : 'text-red-600'
+                  }`}
+                  title="حذف"
+                >
+                  <X size={14} />
+                </button>
+              </div>
             ))}
           </div>
         )}

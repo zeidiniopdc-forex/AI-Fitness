@@ -1,4 +1,4 @@
-import { AppState, AthleteProfile, WorkoutProgram, WorkoutSession, ProgressEntry } from '../types';
+import { AppState, AthleteProfile, WorkoutProgram, NutritionProgram, SupplementProgram, WorkoutSession, ProgressEntry } from '../types';
 
 const STORAGE_KEY = 'ai_fitness_coach_data';
 
@@ -7,9 +7,13 @@ function getInitialState(): AppState {
     profiles: [],
     activeProfileId: null,
     programs: [],
+    nutritionPrograms: [],
+    supplementPrograms: [],
     sessions: [],
     progress: [],
     activeProgram: null,
+    activeNutritionProgram: null,
+    activeSupplementProgram: null,
   };
 }
 
@@ -24,6 +28,14 @@ function migrateState(data: any): AppState {
         ...p,
         profileId: data.profile.id,
       })),
+      nutritionPrograms: (data.nutritionPrograms || []).map((p: any) => ({
+        ...p,
+        profileId: data.profile.id,
+      })),
+      supplementPrograms: (data.supplementPrograms || []).map((p: any) => ({
+        ...p,
+        profileId: data.profile.id,
+      })),
       sessions: (data.sessions || []).map((s: any) => ({
         ...s,
         profileId: data.profile.id,
@@ -33,9 +45,18 @@ function migrateState(data: any): AppState {
         profileId: data.profile.id,
       })),
       activeProgram: data.activeProgram || null,
+      activeNutritionProgram: data.activeNutritionProgram || null,
+      activeSupplementProgram: data.activeSupplementProgram || null,
     };
   }
-  return { ...data, activeProgram: data.activeProgram || null };
+  return { 
+    ...data, 
+    activeProgram: data.activeProgram || null,
+    nutritionPrograms: data.nutritionPrograms || [],
+    supplementPrograms: data.supplementPrograms || [],
+    activeNutritionProgram: data.activeNutritionProgram || null,
+    activeSupplementProgram: data.activeSupplementProgram || null,
+  };
 }
 
 export function loadState(): AppState {
@@ -77,6 +98,8 @@ export function deleteProfile(profileId: string): void {
   const state = loadState();
   state.profiles = state.profiles.filter(p => p.id !== profileId);
   state.programs = state.programs.filter(p => p.profileId !== profileId);
+  state.nutritionPrograms = state.nutritionPrograms.filter(p => p.profileId !== profileId);
+  state.supplementPrograms = state.supplementPrograms.filter(p => p.profileId !== profileId);
   state.sessions = state.sessions.filter(s => s.profileId !== profileId);
   state.progress = state.progress.filter(p => p.profileId !== profileId);
   if (state.activeProfileId === profileId) {
@@ -99,6 +122,46 @@ export function saveProgram(program: WorkoutProgram): void {
 export function deleteProgram(programId: string): void {
   const state = loadState();
   state.programs = state.programs.filter(p => p.id !== programId);
+  saveState(state);
+}
+
+export function saveNutritionProgram(program: NutritionProgram): void {
+  const state = loadState();
+  const existingIndex = state.nutritionPrograms.findIndex(p => p.id === program.id);
+  if (existingIndex >= 0) {
+    state.nutritionPrograms[existingIndex] = program;
+  } else {
+    state.nutritionPrograms.push(program);
+  }
+  saveState(state);
+}
+
+export function deleteNutritionProgram(programId: string): void {
+  const state = loadState();
+  state.nutritionPrograms = state.nutritionPrograms.filter(p => p.id !== programId);
+  if (state.activeNutritionProgram === programId) {
+    state.activeNutritionProgram = null;
+  }
+  saveState(state);
+}
+
+export function saveSupplementProgram(program: SupplementProgram): void {
+  const state = loadState();
+  const existingIndex = state.supplementPrograms.findIndex(p => p.id === program.id);
+  if (existingIndex >= 0) {
+    state.supplementPrograms[existingIndex] = program;
+  } else {
+    state.supplementPrograms.push(program);
+  }
+  saveState(state);
+}
+
+export function deleteSupplementProgram(programId: string): void {
+  const state = loadState();
+  state.supplementPrograms = state.supplementPrograms.filter(p => p.id !== programId);
+  if (state.activeSupplementProgram === programId) {
+    state.activeSupplementProgram = null;
+  }
   saveState(state);
 }
 

@@ -6,11 +6,13 @@ import { NutritionProgram } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { Apple, Save, Eye, AlertCircle, Check } from 'lucide-react';
 import { toPersianNumber } from '../utils/jalali';
+import { useNavigate } from 'react-router-dom';
 
 export default function NutritionImport() {
-  const { activeProfile, addNutritionProgram } = useAppContext();
+  const { activeProfile, addNutritionProgram, setActiveNutritionProgram } = useAppContext();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const navigate = useNavigate();
   const [jsonInput, setJsonInput] = useState('');
   const [validationResult, setValidationResult] = useState<{ valid: boolean; data?: any; error?: string } | null>(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -27,8 +29,9 @@ export default function NutritionImport() {
   const handleImport = () => {
     if (!validationResult?.valid || !validationResult.data || !activeProfile) return;
     
+    const programId = uuidv4();
     const program: NutritionProgram = {
-      id: uuidv4(),
+      id: programId,
       profileId: activeProfile.id,
       plan_name: validationResult.data.plan_name,
       duration: validationResult.data.duration || '۷ روز',
@@ -41,11 +44,15 @@ export default function NutritionImport() {
     };
 
     addNutritionProgram(program);
+    setActiveNutritionProgram(programId);
     setImported(true);
     setJsonInput('');
     setValidationResult(null);
     setShowPreview(false);
-    setTimeout(() => setImported(false), 3000);
+    setTimeout(() => {
+      setImported(false);
+      navigate('/nutrition');
+    }, 1500);
   };
 
   const sampleJSON = JSON.stringify({
@@ -120,7 +127,7 @@ export default function NutritionImport() {
         }`}>
           <Check size={20} className={isDark ? 'text-[#22c55e]' : 'text-[#059669]'} />
           <span className={`font-bold ${isDark ? 'text-[#22c55e]' : 'text-[#059669]'}`}>
-            برنامه غذایی با موفقیت وارد شد!
+            برنامه غذایی با موفقیت وارد شد! در حال انتقال به صفحه تغذیه...
           </span>
         </div>
       )}

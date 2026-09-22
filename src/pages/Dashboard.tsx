@@ -178,7 +178,12 @@ export default function Dashboard() {
 
             {/* Start Button */}
             <button
-              onClick={() => navigate('/workout')}
+              onClick={() => {
+                const today = new Date();
+                const dayOfWeek = (today.getDay() + 1) % 7; // Saturday = 0
+                const dayIndex = dayOfWeek % (activeProgram?.days.length || 1);
+                navigate(`/workout?day=${dayIndex}&autoStart=true`);
+              }}
               className={`w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
                 isDark 
                   ? 'bg-gradient-to-l from-[#d4af37] to-[#f0d060] text-[#0d0d1a] shadow-lg shadow-[#d4af37]/30 hover:opacity-90' 

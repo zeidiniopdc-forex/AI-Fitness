@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
-import { AthleteProfile, Goal, GOAL_LABELS, EXPERIENCE_LABELS, EQUIPMENT_OPTIONS, MUSCLE_GROUPS, getGoalLabel } from '../types';
+import { AthleteProfile, GOAL_LABELS, EXPERIENCE_LABELS, EQUIPMENT_OPTIONS, MUSCLE_GROUPS, PROGRAM_TYPES, ACTIVITY_LEVELS, EQUIPMENT_TYPES, DIET_TYPES, IRANIAN_FOODS, SUPPLEMENT_CATEGORIES, getGoalLabel } from '../types';
 import { v4 as uuidv4 } from 'uuid';
-import { User, Save, ChevronLeft, ChevronRight, Check, Plus, Trash2, Edit } from 'lucide-react';
+import { User, Save, ChevronLeft, ChevronRight, Check, Plus, Trash2, Edit, Dumbbell, Apple, Pill } from 'lucide-react';
 import { toPersianNumber } from '../utils/jalali';
 
-const steps = ['اطلاعات پایه', 'اطلاعات تمرینی', 'سلامت و محدودیت‌ها', 'اهداف'];
+const steps = ['اطلاعات پایه', 'اطلاعات تمرینی', 'تغذیه', 'مکمل‌ها', 'اهداف'];
 
 export default function Profile() {
   const { profiles, activeProfile, saveProfile, deleteProfile, setActiveProfile } = useAppContext();
@@ -23,10 +23,14 @@ export default function Profile() {
     gender: 'male',
     height: 175,
     weight: 75,
+    targetWeight: undefined,
+    activityLevel: 'moderate',
     experience: 'intermediate',
     trainingDays: 4,
     sessionDuration: 60,
     location: 'gym',
+    equipmentType: 'full_gym',
+    customEquipment: [],
     equipment: [],
     injuries: [],
     limitations: [],
@@ -34,10 +38,23 @@ export default function Profile() {
     primaryGoal: 'hypertrophy',
     secondaryGoal: undefined,
     targetMuscles: [],
+    programType: 'full_body',
     timeline: '',
     trainingHistory: '',
     strengthRecords: {},
     bodyMeasurements: {},
+    dietaryGoal: '',
+    dietType: '',
+    foodAllergies: [],
+    favoriteFoods: [],
+    dislikedFoods: [],
+    mealsPerDay: 3,
+    calorieTarget: undefined,
+    cookingSkill: 'basic',
+    supplementGoal: '',
+    currentSupplements: [],
+    supplementBudget: '',
+    healthConditions: [],
   });
 
   useEffect(() => {
@@ -54,10 +71,14 @@ export default function Profile() {
       gender: form.gender || 'male',
       height: form.height || 175,
       weight: form.weight || 75,
+      targetWeight: form.targetWeight,
+      activityLevel: form.activityLevel || 'moderate',
       experience: form.experience || 'intermediate',
       trainingDays: form.trainingDays || 4,
       sessionDuration: form.sessionDuration || 60,
       location: form.location || 'gym',
+      equipmentType: form.equipmentType || 'full_gym',
+      customEquipment: form.customEquipment || [],
       equipment: form.equipment || [],
       injuries: form.injuries || [],
       limitations: form.limitations || [],
@@ -65,10 +86,23 @@ export default function Profile() {
       primaryGoal: form.primaryGoal || 'hypertrophy',
       secondaryGoal: form.secondaryGoal,
       targetMuscles: form.targetMuscles || [],
+      programType: form.programType || 'full_body',
       timeline: form.timeline || '',
       trainingHistory: form.trainingHistory || '',
       strengthRecords: form.strengthRecords || {},
       bodyMeasurements: form.bodyMeasurements || {},
+      dietaryGoal: form.dietaryGoal || '',
+      dietType: form.dietType || '',
+      foodAllergies: form.foodAllergies || [],
+      favoriteFoods: form.favoriteFoods || [],
+      dislikedFoods: form.dislikedFoods || [],
+      mealsPerDay: form.mealsPerDay || 3,
+      calorieTarget: form.calorieTarget,
+      cookingSkill: form.cookingSkill || 'basic',
+      supplementGoal: form.supplementGoal || '',
+      currentSupplements: form.currentSupplements || [],
+      supplementBudget: form.supplementBudget || '',
+      healthConditions: form.healthConditions || [],
       createdAt: activeProfile?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -86,10 +120,14 @@ export default function Profile() {
       gender: 'male',
       height: 175,
       weight: 75,
+      targetWeight: undefined,
+      activityLevel: 'moderate',
       experience: 'intermediate',
       trainingDays: 4,
       sessionDuration: 60,
       location: 'gym',
+      equipmentType: 'full_gym',
+      customEquipment: [],
       equipment: [],
       injuries: [],
       limitations: [],
@@ -97,10 +135,23 @@ export default function Profile() {
       primaryGoal: 'hypertrophy',
       secondaryGoal: undefined,
       targetMuscles: [],
+      programType: 'full_body',
       timeline: '',
       trainingHistory: '',
       strengthRecords: {},
       bodyMeasurements: {},
+      dietaryGoal: '',
+      dietType: '',
+      foodAllergies: [],
+      favoriteFoods: [],
+      dislikedFoods: [],
+      mealsPerDay: 3,
+      calorieTarget: undefined,
+      cookingSkill: 'basic',
+      supplementGoal: '',
+      currentSupplements: [],
+      supplementBudget: '',
+      healthConditions: [],
     });
     setEditingProfileId(null);
     setShowNewProfileForm(true);
@@ -137,6 +188,22 @@ export default function Profile() {
     setForm({
       ...form,
       targetMuscles: current.includes(muscle) ? current.filter(m => m !== muscle) : [...current, muscle]
+    });
+  };
+
+  const toggleFood = (food: string, field: 'favoriteFoods' | 'dislikedFoods') => {
+    const current = form[field] || [];
+    setForm({
+      ...form,
+      [field]: current.includes(food) ? current.filter(f => f !== food) : [...current, food]
+    });
+  };
+
+  const toggleSupplement = (supp: string) => {
+    const current = form.currentSupplements || [];
+    setForm({
+      ...form,
+      currentSupplements: current.includes(supp) ? current.filter(s => s !== supp) : [...current, supp]
     });
   };
 
@@ -205,7 +272,7 @@ export default function Profile() {
                       : 'bg-white border-[#14b8a6]/20 hover:border-[#14b8a6]/40'
                 }`}
               >
-                  <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg ${
                       profile.id === activeProfile?.id
@@ -233,6 +300,7 @@ export default function Profile() {
                     </span>
                   )}
                 </div>
+
                 <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
                   <div className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>
                     قد: <span className={`font-medium ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>{toPersianNumber(profile.height)} cm</span>
@@ -349,8 +417,9 @@ export default function Profile() {
       }`}>
         {step === 0 && <StepBasic form={form} setForm={setForm} isDark={isDark} />}
         {step === 1 && <StepTraining form={form} setForm={setForm} toggleEquipment={toggleEquipment} isDark={isDark} />}
-        {step === 2 && <StepHealth form={form} setForm={setForm} isDark={isDark} />}
-        {step === 3 && <StepGoals form={form} setForm={setForm} toggleTargetMuscle={toggleTargetMuscle} isDark={isDark} />}
+        {step === 2 && <StepNutrition form={form} setForm={setForm} toggleFood={toggleFood} isDark={isDark} />}
+        {step === 3 && <StepSupplements form={form} setForm={setForm} toggleSupplement={toggleSupplement} isDark={isDark} />}
+        {step === 4 && <StepGoals form={form} setForm={setForm} toggleTargetMuscle={toggleTargetMuscle} isDark={isDark} />}
       </div>
 
       {/* Navigation */}
@@ -366,11 +435,11 @@ export default function Profile() {
           قبلی
         </button>
         <span className={isDark ? 'text-gray-500 text-sm' : 'text-[#0f766e]/50 text-sm'}>
-          {toPersianNumber(step + 1)} از {toPersianNumber(4)}
+          {toPersianNumber(step + 1)} از {toPersianNumber(5)}
         </span>
         <button
-          onClick={() => setStep(Math.min(3, step + 1))}
-          disabled={step === 3}
+          onClick={() => setStep(Math.min(4, step + 1))}
+          disabled={step === 4}
           className={`flex items-center gap-1 disabled:opacity-30 transition-all ${
             isDark ? 'text-[#d4af37] hover:text-[#f0d060]' : 'text-[#0d9488] hover:text-[#14b8a6]'
           }`}
@@ -398,7 +467,15 @@ function StepBasic({ form, setForm, isDark }: any) {
           isDark={isDark}
         />
         <NumberField label="قد" value={form.height} onChange={(v: number) => setForm({ ...form, height: v })} suffix="سانتی‌متر" isDark={isDark} />
-        <NumberField label="وزن" value={form.weight} onChange={(v: number) => setForm({ ...form, weight: v })} suffix="کیلوگرم" isDark={isDark} />
+        <NumberField label="وزن فعلی" value={form.weight} onChange={(v: number) => setForm({ ...form, weight: v })} suffix="کیلوگرم" isDark={isDark} />
+        <NumberField label="وزن هدف" value={form.targetWeight} onChange={(v: number) => setForm({ ...form, targetWeight: v })} suffix="کیلوگرم" isDark={isDark} />
+        <SelectField 
+          label="سطح فعالیت" 
+          value={form.activityLevel} 
+          onChange={(v: string) => setForm({ ...form, activityLevel: v })}
+          options={Object.entries(ACTIVITY_LEVELS).map(([value, label]) => ({ value, label }))}
+          isDark={isDark}
+        />
         <SelectField 
           label="سطح تجربه" 
           value={form.experience} 
@@ -412,6 +489,16 @@ function StepBasic({ form, setForm, isDark }: any) {
 }
 
 function StepTraining({ form, setForm, toggleEquipment, isDark }: any) {
+  const [customEquip, setCustomEquip] = useState('');
+
+  const addCustomEquipment = () => {
+    if (customEquip.trim()) {
+      const current = form.customEquipment || [];
+      setForm({ ...form, customEquipment: [...current, customEquip.trim()] });
+      setCustomEquip('');
+    }
+  };
+
   return (
     <div className="space-y-4">
       <h3 className={`font-bold mb-4 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>اطلاعات تمرینی</h3>
@@ -425,25 +512,20 @@ function StepTraining({ form, setForm, toggleEquipment, isDark }: any) {
           options={[
             { value: 'gym', label: 'باشگاه' },
             { value: 'home', label: 'خانه' },
+            { value: 'park', label: 'پارک' },
             { value: 'both', label: 'هر دو' },
           ]}
           isDark={isDark}
         />
-      </div>
-      <div>
-        <label className={`text-sm mb-2 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>سابقه تمرینی</label>
-        <textarea
-          value={form.trainingHistory || ''}
-          onChange={e => setForm({ ...form, trainingHistory: e.target.value })}
-          className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none resize-none theme-transition ${
-            isDark 
-              ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' 
-              : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]'
-          }`}
-          rows={3}
-          placeholder="سابقه تمرینی خود را شرح دهید..."
+        <SelectField 
+          label="نوع تجهیزات" 
+          value={form.equipmentType} 
+          onChange={(v: string) => setForm({ ...form, equipmentType: v })}
+          options={Object.entries(EQUIPMENT_TYPES).map(([value, label]) => ({ value, label }))}
+          isDark={isDark}
         />
       </div>
+      
       <div>
         <label className={`text-sm mb-2 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>تجهیزات موجود</label>
         <div className="flex flex-wrap gap-2">
@@ -466,54 +548,189 @@ function StepTraining({ form, setForm, toggleEquipment, isDark }: any) {
           ))}
         </div>
       </div>
+
+      <div>
+        <label className={`text-sm mb-2 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>اضافه کردن تجهیزات خاص</label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={customEquip}
+            onChange={e => setCustomEquip(e.target.value)}
+            placeholder="نام تجهیزات..."
+            className={`flex-1 border rounded-xl px-4 py-2.5 text-sm focus:outline-none theme-transition ${
+              isDark 
+                ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' 
+                : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]'
+            }`}
+          />
+          <button
+            onClick={addCustomEquipment}
+            className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all ${
+              isDark
+                ? 'bg-[#d4af37] text-[#0d0d1a] hover:bg-[#f0d060]'
+                : 'bg-[#14b8a6] text-white hover:bg-[#0d9488]'
+            }`}
+          >
+            <Plus size={16} />
+          </button>
+        </div>
+        {(form.customEquipment || []).length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {(form.customEquipment || []).map((item: string, idx: number) => (
+              <span key={idx} className={`px-3 py-1.5 rounded-lg text-xs ${
+                isDark ? 'bg-[#4a90d9]/20 text-[#6bb5ff]' : 'bg-[#14b8a6]/15 text-[#0d9488]'
+              }`}>
+                {item}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-function StepHealth({ form, setForm, isDark }: any) {
+function StepNutrition({ form, setForm, toggleFood, isDark }: any) {
   return (
     <div className="space-y-4">
-      <h3 className={`font-bold mb-4 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>سلامت و محدودیت‌ها</h3>
-      <div>
-        <label className={`text-sm mb-2 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>آسیب‌دیدگی‌ها</label>
-        <textarea
-          value={(form.injuries || []).join('، ')}
-          onChange={e => setForm({ ...form, injuries: e.target.value.split('،').map((s: string) => s.trim()).filter(Boolean) })}
-          className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none resize-none theme-transition ${
-            isDark 
-              ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' 
-              : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]'
-          }`}
-          rows={2}
-          placeholder="آسیب‌ها را با ویرگول جدا کنید..."
+      <h3 className={`font-bold mb-4 flex items-center gap-2 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+        <Apple size={18} />
+        اطلاعات تغذیه
+      </h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <InputField label="هدف رژیم غذایی" value={form.dietaryGoal} onChange={(v: string) => setForm({ ...form, dietaryGoal: v })} isDark={isDark} placeholder="مثلاً: کاهش وزن، عضله‌سازی..." />
+        <SelectField 
+          label="نوع رژیم" 
+          value={form.dietType} 
+          onChange={(v: string) => setForm({ ...form, dietType: v })}
+          options={[{ value: '', label: 'انتخاب کنید' }, ...DIET_TYPES.map(d => ({ value: d, label: d }))]}
+          isDark={isDark}
+        />
+        <NumberField label="تعداد وعده در روز" value={form.mealsPerDay} onChange={(v: number) => setForm({ ...form, mealsPerDay: v })} suffix="وعده" isDark={isDark} />
+        <NumberField label="کالری هدف (اختیاری)" value={form.calorieTarget} onChange={(v: number) => setForm({ ...form, calorieTarget: v })} suffix="کالری" isDark={isDark} />
+        <SelectField 
+          label="مهارت آشپزی" 
+          value={form.cookingSkill} 
+          onChange={(v: string) => setForm({ ...form, cookingSkill: v })}
+          options={[
+            { value: 'none', label: 'بدون مهارت' },
+            { value: 'basic', label: 'مقدماتی' },
+            { value: 'intermediate', label: 'متوسط' },
+            { value: 'advanced', label: 'پیشرفته' },
+          ]}
+          isDark={isDark}
         />
       </div>
+
       <div>
-        <label className={`text-sm mb-2 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>محدودیت‌های پزشکی</label>
+        <label className={`text-sm mb-2 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>غذاهای مورد علاقه (ایرانی)</label>
+        <div className="flex flex-wrap gap-2">
+          {IRANIAN_FOODS.map(food => (
+            <button
+              key={food}
+              onClick={() => toggleFood(food, 'favoriteFoods')}
+              className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                (form.favoriteFoods || []).includes(food)
+                  ? isDark
+                    ? 'bg-[#22c55e] text-white font-bold'
+                    : 'bg-[#10b981] text-white font-bold'
+                  : isDark
+                    ? 'bg-[#0d0d1a] text-gray-400 border border-gray-700 hover:border-[#22c55e]'
+                    : 'bg-[#f0fdfa] text-[#0f766e]/70 border border-[#14b8a6]/30 hover:border-[#10b981]'
+              }`}
+            >
+              {food}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className={`text-sm mb-2 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>غذاهای مورد عدم علاقه</label>
+        <div className="flex flex-wrap gap-2">
+          {IRANIAN_FOODS.map(food => (
+            <button
+              key={food}
+              onClick={() => toggleFood(food, 'dislikedFoods')}
+              className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                (form.dislikedFoods || []).includes(food)
+                  ? 'bg-[#ef4444] text-white font-bold'
+                  : isDark
+                    ? 'bg-[#0d0d1a] text-gray-400 border border-gray-700 hover:border-[#ef4444]'
+                    : 'bg-[#f0fdfa] text-[#0f766e]/70 border border-[#14b8a6]/30 hover:border-[#ef4444]'
+              }`}
+            >
+              {food}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className={`text-sm mb-2 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>آلرژی‌های غذایی (با ویرگول جدا کنید)</label>
         <textarea
-          value={(form.limitations || []).join('، ')}
-          onChange={e => setForm({ ...form, limitations: e.target.value.split('،').map((s: string) => s.trim()).filter(Boolean) })}
+          value={(form.foodAllergies || []).join('، ')}
+          onChange={e => setForm({ ...form, foodAllergies: e.target.value.split('،').map((s: string) => s.trim()).filter(Boolean) })}
           className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none resize-none theme-transition ${
             isDark 
               ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' 
               : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]'
           }`}
           rows={2}
-          placeholder="محدودیت‌ها را با ویرگول جدا کنید..."
+          placeholder="مثلاً: شیر، بادام زمینی..."
         />
       </div>
+    </div>
+  );
+}
+
+function StepSupplements({ form, setForm, toggleSupplement, isDark }: any) {
+  return (
+    <div className="space-y-4">
+      <h3 className={`font-bold mb-4 flex items-center gap-2 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+        <Pill size={18} />
+        مکمل‌های ورزشی
+      </h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <InputField label="هدف از مصرف مکمل" value={form.supplementGoal} onChange={(v: string) => setForm({ ...form, supplementGoal: v })} isDark={isDark} placeholder="مثلاً: افزایش حجم، ریکاوری..." />
+        <InputField label="بودجه ماهانه مکمل" value={form.supplementBudget} onChange={(v: string) => setForm({ ...form, supplementBudget: v })} isDark={isDark} placeholder="مثلاً: 500 هزار تومان" />
+      </div>
+
       <div>
-        <label className={`text-sm mb-2 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>تمرینات ممنوعه</label>
+        <label className={`text-sm mb-2 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>مکمل‌های فعلی</label>
+        <div className="flex flex-wrap gap-2">
+          {SUPPLEMENT_CATEGORIES.map(supp => (
+            <button
+              key={supp}
+              onClick={() => toggleSupplement(supp)}
+              className={`px-3 py-1.5 rounded-lg text-xs transition-all ${
+                (form.currentSupplements || []).includes(supp)
+                  ? isDark
+                    ? 'bg-[#4a90d9] text-white font-bold'
+                    : 'bg-[#14b8a6] text-white font-bold'
+                  : isDark
+                    ? 'bg-[#0d0d1a] text-gray-400 border border-gray-700 hover:border-[#4a90d9]'
+                    : 'bg-[#f0fdfa] text-[#0f766e]/70 border border-[#14b8a6]/30 hover:border-[#14b8a6]'
+              }`}
+            >
+              {supp}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className={`text-sm mb-2 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>شرایط پزشکی خاص (با ویرگول جدا کنید)</label>
         <textarea
-          value={(form.avoidedExercises || []).join('، ')}
-          onChange={e => setForm({ ...form, avoidedExercises: e.target.value.split('،').map((s: string) => s.trim()).filter(Boolean) })}
+          value={(form.healthConditions || []).join('، ')}
+          onChange={e => setForm({ ...form, healthConditions: e.target.value.split('،').map((s: string) => s.trim()).filter(Boolean) })}
           className={`w-full border rounded-xl px-4 py-3 text-sm focus:outline-none resize-none theme-transition ${
             isDark 
               ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' 
               : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]'
           }`}
           rows={2}
-          placeholder="تمریناتی که نباید انجام دهید..."
+          placeholder="مثلاً: دیابت، فشار خون..."
         />
       </div>
     </div>
@@ -523,7 +740,10 @@ function StepHealth({ form, setForm, isDark }: any) {
 function StepGoals({ form, setForm, toggleTargetMuscle, isDark }: any) {
   return (
     <div className="space-y-4">
-      <h3 className={`font-bold mb-4 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>اهداف تمرینی</h3>
+      <h3 className={`font-bold mb-4 flex items-center gap-2 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+        <Dumbbell size={18} />
+        اهداف تمرینی
+      </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <GoalInput
           label="هدف اصلی"
@@ -538,6 +758,13 @@ function StepGoals({ form, setForm, toggleTargetMuscle, isDark }: any) {
           onChange={(v: string) => setForm({ ...form, secondaryGoal: v || undefined })}
           isDark={isDark}
           placeholder="هدف ثانویه (اختیاری)..."
+        />
+        <SelectField 
+          label="نوع برنامه تمرینی" 
+          value={form.programType} 
+          onChange={(v: string) => setForm({ ...form, programType: v })}
+          options={Object.entries(PROGRAM_TYPES).map(([value, label]) => ({ value, label }))}
+          isDark={isDark}
         />
       </div>
       <div>
@@ -580,7 +807,7 @@ function StepGoals({ form, setForm, toggleTargetMuscle, isDark }: any) {
   );
 }
 
-function InputField({ label, value, onChange, isDark }: { label: string; value: string; onChange: (v: string) => void; isDark: boolean }) {
+function InputField({ label, value, onChange, isDark, placeholder }: { label: string; value: string; onChange: (v: string) => void; isDark: boolean; placeholder?: string }) {
   return (
     <div>
       <label className={`text-sm mb-1 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>{label}</label>
@@ -588,12 +815,54 @@ function InputField({ label, value, onChange, isDark }: { label: string; value: 
         type="text"
         value={value || ''}
         onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
         className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none theme-transition ${
           isDark 
             ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' 
             : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]'
         }`}
       />
+    </div>
+  );
+}
+
+function NumberField({ label, value, onChange, suffix, isDark }: { label: string; value: number; onChange: (v: number) => void; suffix?: string; isDark: boolean }) {
+  return (
+    <div>
+      <label className={`text-sm mb-1 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+        {label}{suffix ? ` (${suffix})` : ''}
+      </label>
+      <input
+        type="number"
+        value={value || ''}
+        onChange={e => onChange(Number(e.target.value))}
+        className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none theme-transition ${
+          isDark 
+            ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' 
+            : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]'
+        }`}
+      />
+    </div>
+  );
+}
+
+function SelectField({ label, value, onChange, options, isDark }: { label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; isDark: boolean }) {
+  return (
+    <div>
+      <label className={`text-sm mb-1 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>{label}</label>
+      <select
+        value={value || ''}
+        onChange={e => onChange(e.target.value)}
+        className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none theme-transition ${
+          isDark 
+            ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' 
+            : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]'
+        }`}
+      >
+        {options.map(opt => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
     </div>
   );
 }
@@ -659,47 +928,6 @@ function GoalInput({ label, value, onChange, isDark, placeholder }: {
       <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-[#0f766e]/50'}`}>
         می‌توانید هدف دلخواه خود را تایپ کنید یا از پیشنهادات انتخاب کنید
       </p>
-    </div>
-  );
-}
-
-function NumberField({ label, value, onChange, suffix, isDark }: { label: string; value: number; onChange: (v: number) => void; suffix?: string; isDark: boolean }) {
-  return (
-    <div>
-      <label className={`text-sm mb-1 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
-        {label}{suffix ? ` (${suffix})` : ''}
-      </label>
-      <input
-        type="number"
-        value={value || ''}
-        onChange={e => onChange(Number(e.target.value))}
-        className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none theme-transition ${
-          isDark 
-            ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' 
-            : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]'
-        }`}
-      />
-    </div>
-  );
-}
-
-function SelectField({ label, value, onChange, options, isDark }: { label: string; value: string; onChange: (v: string) => void; options: { value: string; label: string }[]; isDark: boolean }) {
-  return (
-    <div>
-      <label className={`text-sm mb-1 block ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>{label}</label>
-      <select
-        value={value || ''}
-        onChange={e => onChange(e.target.value)}
-        className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none theme-transition ${
-          isDark 
-            ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' 
-            : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]'
-        }`}
-      >
-        {options.map(opt => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
-        ))}
-      </select>
     </div>
   );
 }

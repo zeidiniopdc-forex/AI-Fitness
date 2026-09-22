@@ -6,11 +6,13 @@ import { SupplementProgram } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { Pill, Save, Eye, AlertCircle, Check } from 'lucide-react';
 import { toPersianNumber } from '../utils/jalali';
+import { useNavigate } from 'react-router-dom';
 
 export default function SupplementImport() {
-  const { activeProfile, addSupplementProgram } = useAppContext();
+  const { activeProfile, addSupplementProgram, setActiveSupplementProgram } = useAppContext();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const navigate = useNavigate();
   const [jsonInput, setJsonInput] = useState('');
   const [validationResult, setValidationResult] = useState<{ valid: boolean; data?: any; error?: string } | null>(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -27,8 +29,9 @@ export default function SupplementImport() {
   const handleImport = () => {
     if (!validationResult?.valid || !validationResult.data || !activeProfile) return;
     
+    const programId = uuidv4();
     const program: SupplementProgram = {
-      id: uuidv4(),
+      id: programId,
       profileId: activeProfile.id,
       recommendation_title: validationResult.data.recommendation_title,
       summary: validationResult.data.summary || '',
@@ -40,11 +43,15 @@ export default function SupplementImport() {
     };
 
     addSupplementProgram(program);
+    setActiveSupplementProgram(programId);
     setImported(true);
     setJsonInput('');
     setValidationResult(null);
     setShowPreview(false);
-    setTimeout(() => setImported(false), 3000);
+    setTimeout(() => {
+      setImported(false);
+      navigate('/supplements');
+    }, 1500);
   };
 
   const sampleJSON = JSON.stringify({
@@ -96,7 +103,7 @@ export default function SupplementImport() {
         }`}>
           <Check size={20} className={isDark ? 'text-[#22c55e]' : 'text-[#059669]'} />
           <span className={`font-bold ${isDark ? 'text-[#22c55e]' : 'text-[#059669]'}`}>
-            برنامه مکمل با موفقیت وارد شد!
+            برنامه مکمل با موفقیت وارد شد! در حال انتقال به صفحه مکمل...
           </span>
         </div>
       )}

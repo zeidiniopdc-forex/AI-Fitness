@@ -287,7 +287,7 @@ export default function ProgramImport() {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a']`}>
+                    <h4 className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'`}>
                       {program.name}
                     </h4>
                     <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'`}>

@@ -107,7 +107,7 @@ export default function ProgramImport() {
       <h2 className={`text-xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
         <ImportIcon size={22} className={isDark ? 'text-[#22c55e]' : 'text-[#059669]'} />
         ورود برنامه تمرینی
-        <span className={`text-sm font-normal ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+        <span className={`text-sm font-normal ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'`}>
           — {activeProfile.name}
         </span>
       </h2>
@@ -210,7 +210,7 @@ export default function ProgramImport() {
           <div className="space-y-4">
             <div className="flex items-center gap-4 text-sm">
               <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>نام برنامه:</span>
-              <span className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a']}`}>
+              <span className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'`}>
                 {validationResult.data.program_name}
               </span>
             </div>
@@ -222,7 +222,7 @@ export default function ProgramImport() {
             </div>
             <div className="flex items-center gap-4 text-sm">
               <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>تعداد روزها:</span>
-              <span className={isDark ? 'text-white' : 'text-[#134e4a']`}>
+              <span className={isDark ? 'text-white' : 'text-[#134e4a]'}>
                 {toPersianNumber(validationResult.data.days.length)} روز
               </span>
             </div>

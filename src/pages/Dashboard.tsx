@@ -263,7 +263,7 @@ export default function Dashboard() {
           <h3 className={`font-bold flex items-center gap-2 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}><Calendar size={16} />پیشرفت هفتگی</h3>
           <span className={`text-xs font-bold ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>{toPersianNumber(Math.round(weeklyProgress))}٪</span>
         </div>
-        <div className={`w-full h-3 rounded-full overflow-hidden mb-3 ${isDark ? 'bg-gray-800' : 'bg-[#f0fdfa']}`}>
+        <div className={`w-full h-3 rounded-full overflow-hidden mb-3 ${isDark ? 'bg-gray-800' : 'bg-[#f0fdfa]'}`}>
           <div className={`h-full rounded-full transition-all duration-1000 ${isDark ? 'bg-gradient-to-l from-[#d4af37] to-[#f0d060]' : 'bg-gradient-to-l from-[#14b8a6] to-[#0d9488]'}`} style={{ width: `${weeklyProgress}%` }} />
         </div>
         <div className="flex justify-between">
@@ -381,7 +381,7 @@ function StatCard({ icon, label, value, subtext, color, bgColor, borderColor, is
       <p className={`text-xl font-bold ${color}`}>{value}</p>
       <p className={`text-[10px] ${isDark ? 'text-gray-500' : 'text-[#0f766e]/50'}`}>{subtext}</p>
       {progress !== undefined && (
-        <div className={`w-full h-1 rounded-full mt-2 ${isDark ? 'bg-gray-800' : 'bg-[#f0fdfa']}`}>
+        <div className={`w-full h-1 rounded-full mt-2 ${isDark ? 'bg-gray-800' : 'bg-[#f0fdfa]'}`}>
           <div className={`h-full rounded-full transition-all duration-1000 ${isDark ? 'bg-[#d4af37]' : 'bg-[#14b8a6]'}`} style={{ width: `${progress}%` }} />
         </div>
       )}

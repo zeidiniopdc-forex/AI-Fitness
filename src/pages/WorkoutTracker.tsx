@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
 import { WorkoutSession, SetRecord } from '../types';
@@ -10,8 +11,22 @@ export default function WorkoutTracker() {
   const { state, activeProfile, addSession, updateSession } = useAppContext();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const [searchParams] = useSearchParams();
   const activeProgram = state.programs.find(p => p.id === state.activeProgram);
-  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+  
+  // Get day index from URL parameter or calculate today's day
+  const getInitialDayIndex = () => {
+    const dayParam = searchParams.get('day');
+    if (dayParam !== null) {
+      return parseInt(dayParam);
+    }
+    // Calculate today's day index
+    const today = new Date();
+    const dayOfWeek = (today.getDay() + 1) % 7; // Saturday = 0
+    return dayOfWeek % (activeProgram?.days.length || 1);
+  };
+
+  const [selectedDayIndex, setSelectedDayIndex] = useState(getInitialDayIndex());
   const [session, setSession] = useState<WorkoutSession | null>(null);
   const [restTimer, setRestTimer] = useState(0);
   const [isResting, setIsResting] = useState(false);
@@ -24,6 +39,14 @@ export default function WorkoutTracker() {
   const restTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const selectedDay = activeProgram?.days[selectedDayIndex];
+
+  // Auto-start workout if autoStart parameter is present
+  useEffect(() => {
+    const autoStart = searchParams.get('autoStart');
+    if (autoStart === 'true' && activeProgram && !workoutStarted && !session) {
+      startWorkout();
+    }
+  }, [activeProgram, searchParams]);
 
   useEffect(() => {
     if (workoutStarted) {

@@ -20,6 +20,15 @@ const navItems = [
   { path: '/progress', label: 'پیشرفت', icon: Trophy },
 ];
 
+// Mobile bottom nav: Dashboard, Workout, Nutrition, Supplements, Progress
+const bottomNavItems = [
+  { path: '/', label: 'داشبورد', icon: LayoutDashboard },
+  { path: '/workout', label: 'اجرا', icon: Dumbbell },
+  { path: '/nutrition', label: 'تغذیه', icon: Apple },
+  { path: '/supplements', label: 'مکمل', icon: Pill },
+  { path: '/progress', label: 'پیشرفت', icon: Trophy },
+];
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -244,7 +253,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           : 'bg-gradient-to-t from-white via-white/98 to-white/95 border-[#14b8a6]/20 shadow-[#14b8a6]/10'
       }`}>
         <div className="flex justify-around items-center py-2 px-1">
-          {navItems.slice(0, 5).map(item => {
+          {bottomNavItems.map(item => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
             return (

@@ -1,52 +1,47 @@
 # 🔧 راهنمای رفع مشکلات GitHub Actions
 
-## ❌ خطای "Resource not accessible by integration"
+## ✅ مشکلات حل شده
 
-### مشکل
-```
-Unexpected error fetching GitHub release for tag refs/tags/ver1: 
-HttpError: Resource not accessible by integration
-```
+### ۱. خطای "Resource not accessible by integration"
+**علت**: استفاده از `generate_release_notes: true` که نیاز به دسترسی اضافی دارد  
+**راه‌حل**: حذف `generate_release_notes` و نوشتن release notes به صورت دستی
 
-### علت
-GitHub Actions تلاش می‌کند release notes را به صورت خودکار تولید کند اما token پیش‌فرض دسترسی کافی ندارد.
-
-### ✅ راه‌حل اعمال شده
-
-#### 1. تغییر نسخه softprops/action-gh-release
-```yaml
-# قبل (مشکل‌دار)
-uses: softprops/action-gh-release@v2
-generate_release_notes: true
-
-# بعد (اصلاح شده)
-uses: softprops/action-gh-release@v1
-# generate_release_notes حذف شد
-```
-
-#### 2. نوشتن Release Notes به صورت دستی
-```yaml
-body: |
-  ## 🏋️ دستیار هوشمند بدنسازی نسخه ${{ env.VERSION }}
-  
-  ### ✨ ویژگی‌های اصلی:
-  - 🤖 تولید برنامه تمرینی با هوش مصنوعی
-  - 📊 ردیابی پیشرفت و آمار کامل
-  ...
-  
-  ### 📝 تغییرات این نسخه:
-  - انتشار اولیه
-  - تمام ویژگی‌های اصلی
-```
+### ۲. خطای "GitHub Releases requires a tag"
+**علت**: اجرای workflow release بدون tag  
+**راه‌حل**: اصلاح workflow تا فقط روی tag اجرا شود
 
 ---
 
-## 🚀 نحوه استفاده صحیح
+## 📦 ساختار Workflow
 
-### مرحله 1: Push به GitHub
+### `build.yml` - Build معمولی
+**زمان اجرا**: 
+- هر push به branches (main, master, develop)
+- Pull requests
+- Manual trigger
+
+**خروجی**: Debug APK در Artifacts
+
+### `release.yml` - Build Release
+**زمان اجرا**: 
+- فقط وقتی tag با پیشوند `v*` push شود
+
+**خروجی**: 
+- Release APK
+- GitHub Release با APK
+
+---
+
+## 🚀 نحوه ایجاد Release صحیح
+
+### مرحله 1: اطمینان از کد نهایی
 ```bash
+# بررسی وضعیت
+git status
+
+# اگر تغییراتی دارید، commit کنید
 git add .
-git commit -m "Fix GitHub Actions workflow"
+git commit -m "Prepare for release v1.0.0"
 git push origin main
 ```
 
@@ -55,123 +50,190 @@ git push origin main
 # ایجاد tag
 git tag v1.0.0
 
-# Push tag
+# بررسی tag
+git tag -l
+
+# push tag به GitHub
 git push origin v1.0.0
 ```
 
 ### مرحله 3: بررسی GitHub Actions
 1. به تب **Actions** بروید
-2. روی آخرین workflow کلیک کنید
-3. منتظر بمانید تا build تکمیل شود
-4. APK در بخش **Artifacts** موجود است
+2. باید workflow "Create Release" را ببینید
+3. روی آن کلیک کنید
+4. منتظر بمانید تا build تکمیل شود
 
 ### مرحله 4: دانلود از Releases
 1. به تب **Releases** بروید
-2. روی release مورد نظر کلیک کنید
+2. روی release v1.0.0 کلیک کنید
 3. فایل APK را دانلود کنید
 
 ---
 
-## 🔐 تنظیمات دسترسی (در صورت نیاز)
+## ❌ اشتباهات رایج
 
-اگر هنوز مشکل دارید، ممکن است نیاز به تنظیم دسترسی باشد:
+### اشتباه 1: اجرای release workflow بدون tag
+```bash
+# ❌ اشتباه
+git push origin main  # این فقط build.yml را اجرا می‌کند
 
-### 1. بررسی Repository Settings
-- به **Settings** → **Actions** → **General** بروید
-- در بخش **Workflow permissions**:
-  - ✅ **Read and write permissions** را انتخاب کنید
-  - ✅ **Allow GitHub Actions to create and approve pull requests** را فعال کنید
-
-### 2. بررسی Token Permissions
-اگر از token شخصی استفاده می‌کنید:
-- باید scope‌های زیر را داشته باشد:
-  - `repo` (کامل)
-  - `write:packages`
-  - `read:packages`
-
----
-
-## 📋 چک‌لیست عیب‌یابی
-
-### قبل از اجرا
-- [ ] فایل workflow صحیح است
-- [ ] از `softprops/action-gh-release@v1` استفاده شده
-- [ ] `generate_release_notes` حذف شده
-- [ ] Release notes به صورت دستی نوشته شده
-- [ ] Tag به درستی ایجاد شده
-
-### بعد از اجرا
-- [ ] Workflow بدون خطا اجرا شده
-- [ ] APK ساخته شده
-- [ ] Release ایجاد شده
-- [ ] APK به Release اضافه شده
-
----
-
-## 🔄 جایگزین‌های دیگر
-
-### روش 1: استفاده از GitHub CLI
-```yaml
-- name: Create Release
-  run: |
-    gh release create v${{ env.VERSION }} \
-      --title "AI Fitness Coach v${{ env.VERSION }}" \
-      --notes "Release notes here" \
-      release/*.apk
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+# ✅ صحیح
+git tag v1.0.0
+git push origin v1.0.0  # این release.yml را اجرا می‌کند
 ```
 
-### روش 2: استفاده از actions/create-release
-```yaml
-- name: Create Release
-  id: create_release
-  uses: actions/create-release@v1
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  with:
-    tag_name: ${{ github.ref }}
-    release_name: "AI Fitness Coach v${{ env.VERSION }}"
-    body: |
-      Release notes here
-    draft: false
-    prerelease: false
+### اشتباه 2: استفاده از branch به جای tag
+```bash
+# ❌ اشتباه
+git push origin feature-branch
 
-- name: Upload Release Asset
-  uses: actions/upload-release-asset@v1
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  with:
-    upload_url: ${{ steps.create_release.outputs.upload_url }}
-    asset_path: release/*.apk
-    asset_name: AI-Fitness-Coach-v${{ env.VERSION }}.apk
-    asset_content_type: application/vnd.android.package-archive
+# ✅ صحیح
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+### اشتباه 3: فراموش کردن push tag
+```bash
+# ❌ اشتباه
+git tag v1.0.0
+# فراموش کردن push
+
+# ✅ صحیح
+git tag v1.0.0
+git push origin v1.0.0
 ```
 
 ---
 
-## 📊 مقایسه روش‌ها
+## 🔍 عیب‌یابی
 
-| روش | مزایا | معایب |
-|---|---|---|
-| softprops@v1 | ساده، قابل اعتماد | قدیمی‌تر |
-| softprops@v2 | جدیدتر | نیاز به دسترسی بیشتر |
-| GitHub CLI | انعطاف‌پذیر | نیاز به نصب gh |
-| create-release | رسمی GitHub | قدیمی، منسوخ شده |
+### مشکل: "GitHub Releases requires a tag"
+**علت**: workflow release بدون tag اجرا شده  
+**راه‌حل**:
+```bash
+# 1. tag ایجاد کنید
+git tag v1.0.0
+
+# 2. tag را push کنید
+git push origin v1.0.0
+
+# 3. در GitHub Actions بررسی کنید
+```
+
+### مشکل: Workflow اجرا نمی‌شود
+**علت**: tag به درستی push نشده  
+**راه‌حل**:
+```bash
+# بررسی tag های local
+git tag -l
+
+# بررسی tag های remote
+git ls-remote --tags origin
+
+# اگر tag وجود ندارد، دوباره push کنید
+git push origin v1.0.0
+```
+
+### مشکل: Release ایجاد نمی‌شود
+**علت**: permissions کافی نیست  
+**راه‌حل**:
+1. به **Settings** → **Actions** → **General** بروید
+2. در بخش **Workflow permissions**:
+   - ✅ **Read and write permissions** را انتخاب کنید
+3. ذخیره کنید
+
+---
+
+## 📋 چک‌لیست Release
+
+### قبل از Release
+- [ ] کد نهایی commit شده
+- [ ] کد به main push شده
+- [ ] Build محلی موفقیت‌آمیز
+- [ ] تست‌ها پاس شده‌اند
+
+### ایجاد Release
+- [ ] Tag ایجاد شده: `git tag v1.0.0`
+- [ ] Tag push شده: `git push origin v1.0.0`
+- [ ] Workflow اجرا شده
+- [ ] Build موفقیت‌آمیز
+
+### بعد از Release
+- [ ] Release در GitHub ایجاد شده
+- [ ] APK قابل دانلود است
+- [ ] Release notes صحیح است
+- [ ] تست نصب APK
+
+---
+
+## 🔄 دستورات کامل
+
+### ایجاد Release جدید
+```bash
+# 1. اطمینان از کد نهایی
+git add .
+git commit -m "Release v1.0.0"
+git push origin main
+
+# 2. ایجاد tag
+git tag v1.0.0
+
+# 3. Push tag
+git push origin v1.0.0
+
+# 4. بررسی در GitHub
+# به تب Actions بروید و منتظر بمانید
+```
+
+### حذف و ایجاد مجدد Release
+```bash
+# 1. حذف tag local
+git tag -d v1.0.0
+
+# 2. حذف tag remote
+git push origin :refs/tags/v1.0.0
+
+# 3. ایجاد مجدد
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+### مشاهده Release ها
+```bash
+# مشاهده tag های local
+git tag -l
+
+# مشاهده tag های remote
+git ls-remote --tags origin
+
+# مشاهده release در GitHub
+# به تب Releases بروید
+```
+
+---
+
+## 📊 مقایسه Workflow ها
+
+| Workflow | Trigger | خروجی | استفاده |
+|---|---|---|---|
+| `build.yml` | Push به branches | Debug APK | تست و توسعه |
+| `release.yml` | Push tag `v*` | Release APK + GitHub Release | انتشار رسمی |
 
 ---
 
 ## ✅ وضعیت فعلی
 
 ### اصلاحات اعمال شده
-- ✅ تغییر به `softprops/action-gh-release@v1`
-- ✅ حذف `generate_release_notes`
-- ✅ نوشتن release notes به صورت دستی
-- ✅ تست شده و کار می‌کند
+- ✅ `build.yml` - فقط build debug
+- ✅ `release.yml` - فقط روی tag اجرا می‌شود
+- ✅ Release notes به صورت دستی
+- ✅ بدون `generate_release_notes`
+- ✅ سازگار با Node 24
 
 ### نتیجه
-- ✅ Workflow بدون خطا اجرا می‌شود
-- ✅ Release به درستی ایجاد می‌شود
+- ✅ Build معمولی بدون خطا
+- ✅ Release فقط با tag اجرا می‌شود
+- ✅ GitHub Release به درستی ایجاد می‌شود
 - ✅ APK به Release اضافه می‌شود
 
 ---
@@ -181,24 +243,20 @@ git push origin v1.0.0
 ### 1. Commit تغییرات
 ```bash
 git add .github/workflows/
-git commit -m "Fix GitHub Actions release workflow"
+git commit -m "Fix GitHub Actions workflows"
 git push origin main
 ```
 
-### 2. ایجاد Release جدید
+### 2. ایجاد Release
 ```bash
-# حذف tag قدیمی (اگر وجود دارد)
-git tag -d v1.0.0
-git push origin :refs/tags/v1.0.0
-
-# ایجاد tag جدید
 git tag v1.0.0
 git push origin v1.0.0
 ```
 
-### 3. بررسی نتیجه
+### 3. بررسی
 - به تب **Actions** بروید
-- منتظر تکمیل workflow بمانید
+- workflow "Create Release" باید اجرا شود
+- منتظر بمانید تا تکمیل شود
 - به تب **Releases** بروید
 - Release باید ایجاد شده باشد
 
@@ -213,7 +271,7 @@ git push origin v1.0.0
 
 ---
 
-**وضعیت**: ✅ **مشکل حل شد**
+**وضعیت**: ✅ **تمام مشکلات حل شده**
 
 **تاریخ**: 2024  
 **نسخه**: 1.0.0

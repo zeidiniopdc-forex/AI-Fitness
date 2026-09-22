@@ -1,22 +1,16 @@
-name: Build Release APK
+name: Create Release
 
 on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version number (e.g., 1.0.0)'
-        required: true
-        default: '1.0.0'
 
 env:
   APP_NAME: AI-Fitness-Coach
 
 jobs:
-  build-release:
-    name: Build Release APK
+  release:
+    name: Build and Release APK
     runs-on: ubuntu-latest
     
     steps:
@@ -41,99 +35,56 @@ jobs:
           echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
           yes | sdkmanager --licenses > /dev/null 2>&1 || true
           sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" 2>/dev/null || true
+          echo "✅ Android SDK configured"
 
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          npm ci
+          echo "✅ Dependencies installed"
 
       - name: Build Web Application
-        run: npm run build
+        run: |
+          npm run build
+          echo "✅ Web app built"
 
       - name: Add Android Platform
         run: |
           rm -rf android
           npx cap add android
+          echo "✅ Android platform added"
 
       - name: Sync Capacitor
-        run: npx cap sync android
+        run: |
+          npx cap sync android
+          echo "✅ Capacitor synced"
 
       - name: Update Gradle Wrapper
         run: |
           cd android
           sed -i 's|gradle-[0-9.]*-bin.zip|gradle-8.13-bin.zip|g' gradle/wrapper/gradle-wrapper.properties
-
-      # Generate signing key if not exists
-      - name: Generate Signing Key
-        if: env.KEYSTORE_BASE64 == ''
-        env:
-          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-        run: |
-          if [ -z "$KEYSTORE_BASE64" ]; then
-            echo "Generating new signing key..."
-            keytool -genkey -v -keystore android/app/release-key.jks \
-              -keyalg RSA -keysize 2048 -validity 10000 \
-              -alias ai-fitness-key \
-              -storepass "AIFitness2024!" \
-              -keypass "AIFitness2024!" \
-              -dname "CN=AI Fitness Coach, OU=Development, O=AI Fitness, L=Tehran, ST=Tehran, C=IR"
-            echo "SIGNING_KEY_GENERATED=true" >> $GITHUB_ENV
-            echo "SIGNING_PASSWORD=AIFitness2024!" >> $GITHUB_ENV
-          else
-            echo "$KEYSTORE_BASE64" | base64 --decode > android/app/release-key.jks
-            echo "SIGNING_KEY_GENERATED=false" >> $GITHUB_ENV
-          fi
-
-      - name: Configure Signing
-        run: |
-          cd android/app
-          cat >> build.gradle << 'EOF'
-          
-          android {
-              signingConfigs {
-                  release {
-                      storeFile file("release-key.jks")
-                      storePassword "${System.getenv('SIGNING_PASSWORD') ?: 'AIFitness2024!'}"
-                      keyAlias "ai-fitness-key"
-                      keyPassword "${System.getenv('SIGNING_PASSWORD') ?: 'AIFitness2024!'}"
-                  }
-              }
-              buildTypes {
-                  release {
-                      signingConfig signingConfigs.release
-                  }
-              }
-          }
-          EOF
+          echo "✅ Gradle wrapper updated"
 
       - name: Build Release APK
-        env:
-          SIGNING_PASSWORD: ${{ env.SIGNING_PASSWORD }}
         run: |
           cd android
           ./gradlew assembleRelease --no-daemon --stacktrace
+          echo "✅ Release APK built"
 
-      - name: Get Version
+      - name: Get Version from Tag
         id: get_version
         run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-          else
-            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
-          fi
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "✅ Version: $VERSION"
 
       - name: Rename APK
         run: |
           mkdir -p release
           cp android/app/build/outputs/apk/release/app-release.apk "release/AI-Fitness-Coach-v${{ env.VERSION }}.apk"
-
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: AI-Fitness-Coach-Release
-          path: release/*.apk
-          retention-days: 90
+          echo "✅ APK renamed"
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: release/*.apk
           name: "AI Fitness Coach v${{ env.VERSION }}"
@@ -157,7 +108,7 @@ jobs:
             ### 🔧 اطلاعات فنی:
             - حداقل Android: 7.0 (API 24)
             - حجم: ~15 MB
-            - معماری: Universal (ARM, ARM64, x86)
+            - معماری: Universal
             
             ### 📝 تغییرات این نسخه:
             - انتشار اولیه
@@ -171,13 +122,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Summary
+        if: always()
         run: |
           echo "## 🎉 Release Build Complete!" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📦 Build Information" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Release Information" >> $GITHUB_STEP_SUMMARY
           echo "- **Version:** ${{ env.VERSION }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **APK Size:** $(du -h release/*.apk | cut -f1)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build Time:** $(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **APK:** AI-Fitness-Coach-v${{ env.VERSION }}.apk" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📥 Download" >> $GITHUB_STEP_SUMMARY
-          echo "APK file is available in the release artifacts and GitHub Releases." >> $GITHUB_STEP_SUMMARY
+          echo "APK file is available in the release page." >> $GITHUB_STEP_SUMMARY

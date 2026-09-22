@@ -69,6 +69,71 @@ export interface WorkoutProgram {
   days: WorkoutDay[];
 }
 
+export interface NutritionProgram {
+  id: string;
+  profileId: string;
+  plan_name: string;
+  duration: string;
+  daily_calories: number;
+  macros: {
+    protein: number;
+    carbs: number;
+    fats: number;
+  };
+  days: NutritionDay[];
+  hydration: string;
+  supplements?: string;
+  createdAt: string;
+}
+
+export interface NutritionDay {
+  day: string;
+  meals: Meal[];
+  total_calories: number;
+  notes?: string;
+}
+
+export interface Meal {
+  meal_name: string;
+  time: string;
+  foods: Food[];
+  preparation?: string;
+}
+
+export interface Food {
+  name: string;
+  portion: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fats: number;
+}
+
+export interface SupplementProgram {
+  id: string;
+  profileId: string;
+  recommendation_title: string;
+  summary: string;
+  supplements: Supplement[];
+  total_estimated_cost: string;
+  important_notes: string;
+  warnings: string;
+  createdAt: string;
+}
+
+export interface Supplement {
+  name: string;
+  english_name: string;
+  priority: string;
+  dosage: string;
+  timing: string;
+  benefits: string;
+  side_effects: string;
+  estimated_cost: string;
+  recommended_brands: string;
+  notes: string;
+}
+
 export interface WorkoutDay {
   id: string;
   day: string;
@@ -126,9 +191,13 @@ export interface AppState {
   profiles: AthleteProfile[];
   activeProfileId: string | null;
   programs: WorkoutProgram[];
+  nutritionPrograms: NutritionProgram[];
+  supplementPrograms: SupplementProgram[];
   sessions: WorkoutSession[];
   progress: ProgressEntry[];
   activeProgram: string | null;
+  activeNutritionProgram: string | null;
+  activeSupplementProgram: string | null;
 }
 
 export const GOAL_LABELS: Record<Goal, string> = {

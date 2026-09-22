@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, User, Brain, Dumbbell, Calendar, 
-  Import, Trophy, Menu, X, Sun, Moon
+  Import, Trophy, Menu, X, Sun, Moon, Apple, Pill
 } from 'lucide-react';
 import { useState } from 'react';
 import { toPersianNumber, getPersianDate } from '../utils/jalali';
@@ -12,8 +12,10 @@ const navItems = [
   { path: '/', label: 'داشبورد', icon: LayoutDashboard },
   { path: '/profile', label: 'پروفایل', icon: User },
   { path: '/prompt', label: 'پرامپت', icon: Brain },
-  { path: '/import', label: 'برنامه', icon: Import },
-  { path: '/workout', label: 'تمرین', icon: Dumbbell },
+  { path: '/import', label: 'تمرین', icon: Import },
+  { path: '/nutrition', label: 'تغذیه', icon: Apple },
+  { path: '/supplements', label: 'مکمل', icon: Pill },
+  { path: '/workout', label: 'اجرا', icon: Dumbbell },
   { path: '/calendar', label: 'تقویم', icon: Calendar },
   { path: '/progress', label: 'پیشرفت', icon: Trophy },
 ];

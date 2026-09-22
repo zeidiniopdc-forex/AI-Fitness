@@ -1,17 +1,35 @@
 import { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { generateAIPrompt } from '../utils/promptGenerator';
-import { Brain, Copy, Check, AlertTriangle, ExternalLink } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { generateWorkoutPrompt, generateNutritionPrompt, generateSupplementPrompt } from '../utils/promptGenerator';
+import { Brain, Dumbbell, Apple, Pill, Copy, Check, AlertTriangle } from 'lucide-react';
+
+type PromptType = 'workout' | 'nutrition' | 'supplement';
 
 export default function PromptGenerator() {
   const { activeProfile } = useAppContext();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  const [promptType, setPromptType] = useState<PromptType>('workout');
   const [generatedPrompt, setGeneratedPrompt] = useState('');
   const [copied, setCopied] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('');
 
   const handleGenerate = () => {
     if (!activeProfile) return;
-    const prompt = generateAIPrompt(activeProfile);
+    
+    let prompt = '';
+    switch (promptType) {
+      case 'workout':
+        prompt = generateWorkoutPrompt(activeProfile);
+        break;
+      case 'nutrition':
+        prompt = generateNutritionPrompt(activeProfile);
+        break;
+      case 'supplement':
+        prompt = generateSupplementPrompt(activeProfile);
+        break;
+    }
+    
     setGeneratedPrompt(prompt);
   };
 
@@ -21,60 +39,114 @@ export default function PromptGenerator() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const getModelUrl = (model: string) => {
-    switch (model) {
-      case 'chatgpt': return 'https://chat.openai.com';
-      case 'gemini': return 'https://gemini.google.com';
-      case 'claude': return 'https://claude.ai';
-      default: return '';
-    }
-  };
-
   if (!activeProfile) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <AlertTriangle size={48} className="text-[#f59e0b] mb-4" />
-        <h2 className="text-xl font-bold text-white mb-2">پروفایل تکمیل نشده</h2>
-        <p className="text-gray-400 text-center">لطفاً ابتدا پروفایل ورزشکار را در بخش پروفایل تکمیل کنید</p>
+        <AlertTriangle size={48} className={isDark ? 'text-[#f59e0b]' : 'text-[#d97706]'} />
+        <h2 className={`text-xl font-bold mt-4 mb-2 ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+          پروفایل تکمیل نشده
+        </h2>
+        <p className={`text-center ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+          لطفاً ابتدا پروفایل ورزشکار را در بخش پروفایل تکمیل کنید
+        </p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-white flex items-center gap-2">
-          <Brain size={22} className="text-[#4a90d9]" />
-          تولید پرامپت هوشمند
-        </h2>
-      </div>
+      <h2 className={`text-2xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+        <Brain size={24} className={isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'} />
+        تولید پرامپت هوش مصنوعی
+      </h2>
 
-      {/* Info Card */}
-      <div className="bg-gradient-to-l from-[#4a90d9]/10 to-transparent rounded-2xl p-5 border border-[#4a90d9]/20">
-        <h3 className="text-[#4a90d9] font-bold mb-2">🧠 چگونه کار می‌کند؟</h3>
-        <p className="text-gray-300 text-sm leading-6">
-          این ابزار بر اساس اطلاعات پروفایل ورزشکار، یک پرامپت حرفه‌ای و علمی تولید می‌کند که می‌توانید آن را به هر مدل هوش مصنوعی (ChatGPT، Gemini، Claude و ...) ارسال کنید تا برنامه تمرینی سفارشی دریافت کنید.
-        </p>
+      {/* Prompt Type Selector */}
+      <div className={`rounded-2xl p-4 border theme-transition ${
+        isDark ? 'bg-[#1a1a2e] border-[#d4af37]/10' : 'bg-white border-[#14b8a6]/15'
+      }`}>
+        <h3 className={`font-bold mb-3 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+          نوع پرامپت
+        </h3>
+        <div className="grid grid-cols-3 gap-3">
+          <button
+            onClick={() => setPromptType('workout')}
+            className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all ${
+              promptType === 'workout'
+                ? isDark
+                  ? 'bg-[#d4af37]/20 border-2 border-[#d4af37] text-[#d4af37]'
+                  : 'bg-[#14b8a6]/15 border-2 border-[#14b8a6] text-[#0d9488]'
+                : isDark
+                  ? 'bg-[#0d0d1a] border border-gray-700 text-gray-400 hover:border-[#d4af37]'
+                  : 'bg-[#f0fdfa] border border-[#14b8a6]/30 text-[#0f766e]/70 hover:border-[#14b8a6]'
+            }`}
+          >
+            <Dumbbell size={24} />
+            <span className="text-sm font-bold">تمرین</span>
+          </button>
+          <button
+            onClick={() => setPromptType('nutrition')}
+            className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all ${
+              promptType === 'nutrition'
+                ? isDark
+                  ? 'bg-[#d4af37]/20 border-2 border-[#d4af37] text-[#d4af37]'
+                  : 'bg-[#14b8a6]/15 border-2 border-[#14b8a6] text-[#0d9488]'
+                : isDark
+                  ? 'bg-[#0d0d1a] border border-gray-700 text-gray-400 hover:border-[#d4af37]'
+                  : 'bg-[#f0fdfa] border border-[#14b8a6]/30 text-[#0f766e]/70 hover:border-[#14b8a6]'
+            }`}
+          >
+            <Apple size={24} />
+            <span className="text-sm font-bold">تغذیه</span>
+          </button>
+          <button
+            onClick={() => setPromptType('supplement')}
+            className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all ${
+              promptType === 'supplement'
+                ? isDark
+                  ? 'bg-[#d4af37]/20 border-2 border-[#d4af37] text-[#d4af37]'
+                  : 'bg-[#14b8a6]/15 border-2 border-[#14b8a6] text-[#0d9488]'
+                : isDark
+                  ? 'bg-[#0d0d1a] border border-gray-700 text-gray-400 hover:border-[#d4af37]'
+                  : 'bg-[#f0fdfa] border border-[#14b8a6]/30 text-[#0f766e]/70 hover:border-[#14b8a6]'
+            }`}
+          >
+            <Pill size={24} />
+            <span className="text-sm font-bold">مکمل</span>
+          </button>
+        </div>
       </div>
 
       {/* Profile Summary */}
-      <div className="bg-[#1a1a2e] rounded-2xl p-5 border border-[#d4af37]/10">
-        <h3 className="text-[#d4af37] font-bold mb-3">خلاصه اطلاعات ارسالی</h3>
+      <div className={`rounded-2xl p-5 border theme-transition ${
+        isDark ? 'bg-[#1a1a2e] border-[#d4af37]/10' : 'bg-white border-[#14b8a6]/15'
+      }`}>
+        <h3 className={`font-bold mb-3 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+          خلاصه اطلاعات ارسالی
+        </h3>
         <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="text-gray-400">نام: <span className="text-white">{activeProfile.name}</span></div>
-          <div className="text-gray-400">سن: <span className="text-white">{activeProfile.age} سال</span></div>
-          <div className="text-gray-400">وزن: <span className="text-white">{activeProfile.weight} کیلو</span></div>
-          <div className="text-gray-400">قد: <span className="text-white">{activeProfile.height} سانتی‌متر</span></div>
-          <div className="text-gray-400">هدف: <span className="text-white">{activeProfile.primaryGoal}</span></div>
-          <div className="text-gray-400">روزهای تمرین: <span className="text-white">{activeProfile.trainingDays} روز</span></div>
+          <div className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>
+            نام: <span className={isDark ? 'text-white' : 'text-[#134e4a]'}>{activeProfile.name}</span>
+          </div>
+          <div className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>
+            سن: <span className={isDark ? 'text-white' : 'text-[#134e4a]'}>{activeProfile.age} سال</span>
+          </div>
+          <div className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>
+            وزن: <span className={isDark ? 'text-white' : 'text-[#134e4a]'}>{activeProfile.weight} کیلو</span>
+          </div>
+          <div className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>
+            قد: <span className={isDark ? 'text-white' : 'text-[#134e4a]'}>{activeProfile.height} سانتی‌متر</span>
+          </div>
         </div>
       </div>
 
       {/* Generate Button */}
       <button
         onClick={handleGenerate}
-        className="w-full bg-gradient-to-l from-[#4a90d9] to-[#6bb5ff] text-white py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-all shadow-lg shadow-[#4a90d9]/20"
+        className={`w-full py-4 rounded-xl font-bold text-lg transition-all shadow-lg ${
+          isDark
+            ? 'bg-gradient-to-l from-[#d4af37] to-[#f0d060] text-[#0d0d1a] shadow-[#d4af37]/20 hover:opacity-90'
+            : 'bg-gradient-to-l from-[#14b8a6] to-[#0d9488] text-white shadow-[#14b8a6]/20 hover:opacity-90'
+        }`}
       >
         🚀 تولید پرامپت حرفه‌ای
       </button>
@@ -83,46 +155,38 @@ export default function PromptGenerator() {
       {generatedPrompt && (
         <div className="space-y-4 animate-slide-up">
           <div className="flex items-center justify-between">
-            <h3 className="text-[#22c55e] font-bold">✅ پرامپت تولید شد</h3>
+            <h3 className={`font-bold ${isDark ? 'text-[#22c55e]' : 'text-[#059669]'}`}>
+              ✅ پرامپت تولید شد
+            </h3>
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1 bg-[#22c55e]/20 text-[#22c55e] px-3 py-1.5 rounded-lg text-sm hover:bg-[#22c55e]/30 transition-all"
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-all ${
+                isDark
+                  ? 'bg-[#22c55e]/20 text-[#22c55e] hover:bg-[#22c55e]/30'
+                  : 'bg-[#10b981]/15 text-[#059669] hover:bg-[#10b981]/25'
+              }`}
             >
               {copied ? <Check size={14} /> : <Copy size={14} />}
               {copied ? 'کپی شد!' : 'کپی'}
             </button>
           </div>
           
-          <div className="bg-[#0d0d1a] rounded-xl p-4 border border-gray-700 max-h-96 overflow-y-auto">
-            <pre className="text-gray-300 text-sm whitespace-pre-wrap leading-7 font-vazir">
+          <div className={`rounded-xl p-4 border max-h-96 overflow-y-auto ${
+            isDark ? 'bg-[#0d0d1a] border-gray-700' : 'bg-[#f0fdfa] border-[#14b8a6]/30'
+          }`}>
+            <pre className={`text-sm whitespace-pre-wrap leading-7 font-vazir ${
+              isDark ? 'text-gray-300' : 'text-[#134e4a]'
+            }`}>
               {generatedPrompt}
             </pre>
           </div>
 
-          {/* AI Model Links */}
-          <div className="bg-[#1a1a2e] rounded-2xl p-5 border border-[#d4af37]/10">
-            <h3 className="text-[#d4af37] font-bold mb-3">ارسال به مدل هوش مصنوعی</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {[
-                { id: 'chatgpt', name: 'ChatGPT', color: 'from-green-600 to-green-800' },
-                { id: 'gemini', name: 'Gemini', color: 'from-blue-600 to-blue-800' },
-                { id: 'claude', name: 'Claude', color: 'from-orange-600 to-orange-800' },
-              ].map(model => (
-                <a
-                  key={model.id}
-                  href={getModelUrl(model.id)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setSelectedModel(model.id)}
-                  className={`bg-gradient-to-l ${model.color} text-white py-3 px-4 rounded-xl text-center font-bold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2`}
-                >
-                  <ExternalLink size={14} />
-                  ارسال به {model.name}
-                </a>
-              ))}
-            </div>
-            <p className="text-gray-500 text-xs mt-3">
-              * پس از باز کردن مدل AI، پرامپت را در آن پیست کنید
+          <div className={`rounded-xl p-4 border ${
+            isDark ? 'bg-[#1a1a2e] border-[#d4af37]/10' : 'bg-white border-[#14b8a6]/15'
+          }`}>
+            <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+              💡 <strong>راهنما:</strong> پرامپت بالا را کپی کنید و در ChatGPT، Gemini یا Claude پیست کنید. 
+              خروجی JSON دریافتی را می‌توانید در بخش «ورود برنامه» وارد کنید.
             </p>
           </div>
         </div>

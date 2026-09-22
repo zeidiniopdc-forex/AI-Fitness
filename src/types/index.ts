@@ -152,15 +152,15 @@ export const EXPERIENCE_LABELS: Record<string, string> = {
 };
 
 export const EQUIPMENT_OPTIONS = [
-  'Barbell', 'Dumbbell', 'Cable Machine', 'Smith Machine', 'Lat Pulldown',
-  'Low Cable', 'High Cable', 'Bench', 'Pull-up Bar', 'Dip Station',
-  'Kettlebell', 'TRX', 'Resistance Bands', 'Bodyweight', 'Leg Press',
-  'Chest Press Machine', 'Weight Plates', 'Adjustable Dumbbells'
+  'هالتر', 'دمبل', 'دستگاه سیم‌کش', 'دستگاه اسمیت', 'زیربغل سیم‌کش',
+  'سیم‌کش پایین', 'سیم‌کش بالا', 'نیمکت', 'میله بارفیکس', 'پارالل',
+  'کتل‌بل', 'تی‌آرایکس', 'کش مقاومتی', 'وزن بدن', 'پرس پا',
+  'دستگاه پرس سینه', 'صفحه وزنه', 'دمبل متغیر'
 ];
 
 export const MUSCLE_GROUPS = [
-  'Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps',
-  'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Abs', 'Traps', 'Forearms'
+  'سینه', 'پشت', 'سرشانه', 'جلوبازو', 'پشت‌بازو',
+  'چهارسر ران', 'همسترینگ', 'باسن', 'ساق پا', 'شکم', 'کول', 'ساعد'
 ];
 
 export const PROGRAM_TYPES = {
@@ -192,15 +192,18 @@ export const DIET_TYPES = [
 ];
 
 export const IRANIAN_FOODS = [
-  'Chelo Kabab', 'Ghormeh Sabzi', 'Gheymeh', 'Tahchin',
-  'Ash Reshteh', 'Kuku Sabzi', 'Fesenjan', 'Zereshk Polo',
-  'Baghali Polo', 'Dizi', 'Abgoosht', 'Tahdig',
-  'Sangak Bread', 'Lavash', 'Rice', 'Lentil Stew',
-  'Yogurt', 'Doogh', 'Fresh Herbs', 'Walnuts'
+  'چلو کباب', 'قورمه‌سبزی', 'قیمه', 'ته‌چین',
+  'آش رشته', 'کوکو سبزی', 'فسنجان', 'زرشک‌پلو',
+  'باقالی‌پلو', 'دیزی', 'آبگوشت', 'ته‌دیگ',
+  'نان سنگک', 'نان لواش', 'برنج', 'عدس‌پلو',
+  'ماست', 'دوغ', 'سبزی خوردن', 'گردو',
+  'مرغ', 'ماهی', 'گوشت قرمز', 'تخم‌مرغ',
+  'لوبیا', 'نخود', 'لentils', 'سیب‌زمینی',
+  'گوجه‌فرنگی', 'خیار', 'پیاز', 'سیر'
 ];
 
 export const SUPPLEMENT_CATEGORIES = [
-  'Protein Powder', 'Creatine', 'BCAA', 'Pre-Workout',
-  'Multivitamin', 'Omega-3', 'Vitamin D', 'ZMA',
-  'Glutamine', 'Beta-Alanine', 'Citrulline', 'Caffeine'
+  'پودر پروتئین', 'کراتین', 'بی‌سی‌ای‌ای', 'پری‌ورک‌اوت',
+  'مولتی‌ویتامین', 'امگا ۳', 'ویتامین D', 'ZMA',
+  'گلوتامین', 'بتا-آلانین', 'سیترولین', 'کافئین'
 ];

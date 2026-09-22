@@ -5,10 +5,14 @@ export interface AthleteProfile {
   gender: 'male' | 'female';
   height: number;
   weight: number;
+  targetWeight?: number;
+  activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
   experience: 'beginner' | 'intermediate' | 'advanced' | 'professional';
   trainingDays: number;
   sessionDuration: number;
-  location: 'gym' | 'home' | 'both';
+  location: 'gym' | 'home' | 'both' | 'park';
+  equipmentType: 'full_gym' | 'home' | 'park' | 'custom';
+  customEquipment: string[];
   equipment: string[];
   injuries: string[];
   limitations: string[];
@@ -16,10 +20,23 @@ export interface AthleteProfile {
   primaryGoal: string;
   secondaryGoal?: string;
   targetMuscles: string[];
+  programType: 'full_body' | 'split' | 'push_pull_legs' | 'upper_lower' | 'ai_suggested';
   timeline: string;
   trainingHistory: string;
   strengthRecords: Record<string, string>;
   bodyMeasurements: BodyMeasurements;
+  dietaryGoal: string;
+  dietType: string;
+  foodAllergies: string[];
+  favoriteFoods: string[];
+  dislikedFoods: string[];
+  mealsPerDay: number;
+  calorieTarget?: number;
+  cookingSkill: 'none' | 'basic' | 'intermediate' | 'advanced';
+  supplementGoal: string;
+  currentSupplements: string[];
+  supplementBudget: string;
+  healthConditions: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -115,12 +132,12 @@ export interface AppState {
 }
 
 export const GOAL_LABELS: Record<Goal, string> = {
-  hypertrophy: 'عضله‌سازی',
-  strength: 'افزایش قدرت',
-  fat_loss: 'چربی‌سوزی',
-  recomposition: 'بازسازی بدن',
-  competition: 'آمادگی مسابقه',
-  general_fitness: 'آمادگی عمومی',
+  hypertrophy: 'Muscle Building',
+  strength: 'Strength Gain',
+  fat_loss: 'Fat Loss',
+  recomposition: 'Body Recomposition',
+  competition: 'Competition Prep',
+  general_fitness: 'General Fitness',
 };
 
 export function getGoalLabel(goal: string): string {
@@ -128,20 +145,62 @@ export function getGoalLabel(goal: string): string {
 }
 
 export const EXPERIENCE_LABELS: Record<string, string> = {
-  beginner: 'مبتدی',
-  intermediate: 'متوسط',
-  advanced: 'پیشرفته',
-  professional: 'حرفه‌ای',
+  beginner: 'Beginner',
+  intermediate: 'Intermediate',
+  advanced: 'Advanced',
+  professional: 'Professional',
 };
 
 export const EQUIPMENT_OPTIONS = [
-  'هالتر', 'دمبل', 'کابل کراس', 'دستگاه اسمیت', 'دستگاه سیم‌کش',
-  'پولی پایین', 'پولی بالا', 'نیمکت', 'بارفیکس', 'دیپ',
-  'کتل‌بل', 'TRX', 'کش مقاومتی', 'وزن بدن', 'دستگاه لگ پرس',
-  'دستگاه اسمیت ماشین', 'صفحه وزنه', 'دمبل قابل تنظیم'
+  'Barbell', 'Dumbbell', 'Cable Machine', 'Smith Machine', 'Lat Pulldown',
+  'Low Cable', 'High Cable', 'Bench', 'Pull-up Bar', 'Dip Station',
+  'Kettlebell', 'TRX', 'Resistance Bands', 'Bodyweight', 'Leg Press',
+  'Chest Press Machine', 'Weight Plates', 'Adjustable Dumbbells'
 ];
 
 export const MUSCLE_GROUPS = [
-  'سینه', 'پشت', 'سرشانه', 'جلوبازو', 'پشت‌بازو',
-  'چهارسر ران', 'همسترینگ', 'سرنشین', 'ساق پا', 'شکم', 'کول', 'ذوزنقه'
+  'Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps',
+  'Quads', 'Hamstrings', 'Glutes', 'Calves', 'Abs', 'Traps', 'Forearms'
+];
+
+export const PROGRAM_TYPES = {
+  full_body: 'Full Body',
+  split: 'Body Part Split',
+  push_pull_legs: 'Push/Pull/Legs',
+  upper_lower: 'Upper/Lower',
+  ai_suggested: 'AI Suggested',
+};
+
+export const ACTIVITY_LEVELS = {
+  sedentary: 'Sedentary (desk job)',
+  light: 'Lightly Active',
+  moderate: 'Moderately Active',
+  active: 'Very Active',
+  very_active: 'Extremely Active',
+};
+
+export const EQUIPMENT_TYPES = {
+  full_gym: 'Full Gym',
+  home: 'Home Gym',
+  park: 'Park/Outdoor',
+  custom: 'Custom Setup',
+};
+
+export const DIET_TYPES = [
+  'Balanced', 'High Protein', 'Low Carb', 'Mediterranean', 
+  'Vegetarian', 'Vegan', 'Keto', 'Traditional Iranian'
+];
+
+export const IRANIAN_FOODS = [
+  'Chelo Kabab', 'Ghormeh Sabzi', 'Gheymeh', 'Tahchin',
+  'Ash Reshteh', 'Kuku Sabzi', 'Fesenjan', 'Zereshk Polo',
+  'Baghali Polo', 'Dizi', 'Abgoosht', 'Tahdig',
+  'Sangak Bread', 'Lavash', 'Rice', 'Lentil Stew',
+  'Yogurt', 'Doogh', 'Fresh Herbs', 'Walnuts'
+];
+
+export const SUPPLEMENT_CATEGORIES = [
+  'Protein Powder', 'Creatine', 'BCAA', 'Pre-Workout',
+  'Multivitamin', 'Omega-3', 'Vitamin D', 'ZMA',
+  'Glutamine', 'Beta-Alanine', 'Citrulline', 'Caffeine'
 ];

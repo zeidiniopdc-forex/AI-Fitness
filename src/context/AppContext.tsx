@@ -65,9 +65,47 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [state.progress, state.activeProfileId]
   );
 
-  // Profile management
+  const nutritionPrograms = useMemo(() => 
+    state.nutritionPrograms.filter(p => p.profileId === state.activeProfileId),
+    [state.nutritionPrograms, state.activeProfileId]
+  );
+
+  const supplementPrograms = useMemo(() => 
+    state.supplementPrograms.filter(p => p.profileId === state.activeProfileId),
+    [state.supplementPrograms, state.activeProfileId]
+  );
+
+  // Profile management — when switching profile, also switch active programs
   const setActiveProfile = useCallback((id: string | null) => {
-    setState(prev => ({ ...prev, activeProfileId: id }));
+    setState(prev => {
+      if (id === prev.activeProfileId) return prev;
+
+      const profilePrograms = prev.programs.filter(p => p.profileId === id);
+      const profileNutrition = prev.nutritionPrograms.filter(p => p.profileId === id);
+      const profileSupplements = prev.supplementPrograms.filter(p => p.profileId === id);
+
+      // Keep current active if it belongs to the new profile; otherwise pick first or null
+      const nextActiveProgram =
+        profilePrograms.find(p => p.id === prev.activeProgram)?.id ??
+        profilePrograms[0]?.id ??
+        null;
+      const nextActiveNutrition =
+        profileNutrition.find(p => p.id === prev.activeNutritionProgram)?.id ??
+        profileNutrition[0]?.id ??
+        null;
+      const nextActiveSupplement =
+        profileSupplements.find(p => p.id === prev.activeSupplementProgram)?.id ??
+        profileSupplements[0]?.id ??
+        null;
+
+      return {
+        ...prev,
+        activeProfileId: id,
+        activeProgram: nextActiveProgram,
+        activeNutritionProgram: nextActiveNutrition,
+        activeSupplementProgram: nextActiveSupplement,
+      };
+    });
   }, []);
 
   const saveProfile = useCallback((profile: AthleteProfile) => {
@@ -91,44 +129,42 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const deleteProfile = useCallback((id: string) => {
     setState(prev => {
       const newProfiles = prev.profiles.filter(p => p.id !== id);
+      const nextProfileId = prev.activeProfileId === id
+        ? (newProfiles.length > 0 ? newProfiles[0].id : null)
+        : prev.activeProfileId;
+
+      const remainingPrograms = prev.programs.filter(p => p.profileId !== id);
+      const remainingNutrition = prev.nutritionPrograms.filter(p => p.profileId !== id);
+      const remainingSupplements = prev.supplementPrograms.filter(p => p.profileId !== id);
+
+      const nextPrograms = remainingPrograms.filter(p => p.profileId === nextProfileId);
+      const nextNutrition = remainingNutrition.filter(p => p.profileId === nextProfileId);
+      const nextSupplements = remainingSupplements.filter(p => p.profileId === nextProfileId);
+
       return {
         ...prev,
         profiles: newProfiles,
-        programs: prev.programs.filter(p => p.profileId !== id),
-        nutritionPrograms: prev.nutritionPrograms.filter(p => p.profileId !== id),
-        supplementPrograms: prev.supplementPrograms.filter(p => p.profileId !== id),
+        programs: remainingPrograms,
+        nutritionPrograms: remainingNutrition,
+        supplementPrograms: remainingSupplements,
         sessions: prev.sessions.filter(s => s.profileId !== id),
         progress: prev.progress.filter(p => p.profileId !== id),
-        activeProfileId: prev.activeProfileId === id 
-          ? (newProfiles.length > 0 ? newProfiles[0].id : null)
-          : prev.activeProfileId,
-        activeProgram: prev.programs.find(p => p.id === prev.activeProgram && p.profileId !== id) 
-          ? prev.activeProgram 
-          : null,
-        activeNutritionProgram: prev.nutritionPrograms.find(p => p.id === prev.activeNutritionProgram && p.profileId !== id)
-          ? prev.activeNutritionProgram
-          : null,
-        activeSupplementProgram: prev.supplementPrograms.find(p => p.id === prev.activeSupplementProgram && p.profileId !== id)
-          ? prev.activeSupplementProgram
-          : null,
+        activeProfileId: nextProfileId,
+        activeProgram: nextPrograms[0]?.id ?? null,
+        activeNutritionProgram: nextNutrition[0]?.id ?? null,
+        activeSupplementProgram: nextSupplements[0]?.id ?? null,
       };
     });
   }, []);
 
-  // Filtered data for active profile
-  const nutritionPrograms = useMemo(() => 
-    state.nutritionPrograms.filter(p => p.profileId === state.activeProfileId),
-    [state.nutritionPrograms, state.activeProfileId]
-  );
-
-  const supplementPrograms = useMemo(() => 
-    state.supplementPrograms.filter(p => p.profileId === state.activeProfileId),
-    [state.supplementPrograms, state.activeProfileId]
-  );
-
   // Workout Program management
   const addProgram = useCallback((program: WorkoutProgram) => {
-    setState(prev => ({ ...prev, programs: [...prev.programs, program] }));
+    setState(prev => ({
+      ...prev,
+      programs: [...prev.programs, program],
+      // Auto-activate if this is the first program for the profile or no active
+      activeProgram: prev.activeProgram || program.id,
+    }));
   }, []);
 
   const updateProgram = useCallback((program: WorkoutProgram) => {
@@ -139,11 +175,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const removeProgram = useCallback((id: string) => {
-    setState(prev => ({
-      ...prev,
-      programs: prev.programs.filter(p => p.id !== id),
-      activeProgram: prev.activeProgram === id ? null : prev.activeProgram
-    }));
+    setState(prev => {
+      const remaining = prev.programs.filter(p => p.id !== id);
+      const stillActive = prev.activeProgram === id
+        ? (remaining.find(p => p.profileId === prev.activeProfileId)?.id ?? null)
+        : prev.activeProgram;
+      return {
+        ...prev,
+        programs: remaining,
+        activeProgram: stillActive,
+      };
+    });
   }, []);
 
   const setActiveProgram = useCallback((id: string | null) => {
@@ -152,15 +194,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Nutrition Program management
   const addNutritionProgram = useCallback((program: NutritionProgram) => {
-    setState(prev => ({ ...prev, nutritionPrograms: [...prev.nutritionPrograms, program] }));
+    setState(prev => ({
+      ...prev,
+      nutritionPrograms: [...prev.nutritionPrograms, program],
+      activeNutritionProgram: prev.activeNutritionProgram || program.id,
+    }));
   }, []);
 
   const removeNutritionProgram = useCallback((id: string) => {
-    setState(prev => ({
-      ...prev,
-      nutritionPrograms: prev.nutritionPrograms.filter(p => p.id !== id),
-      activeNutritionProgram: prev.activeNutritionProgram === id ? null : prev.activeNutritionProgram
-    }));
+    setState(prev => {
+      const remaining = prev.nutritionPrograms.filter(p => p.id !== id);
+      const stillActive = prev.activeNutritionProgram === id
+        ? (remaining.find(p => p.profileId === prev.activeProfileId)?.id ?? null)
+        : prev.activeNutritionProgram;
+      return {
+        ...prev,
+        nutritionPrograms: remaining,
+        activeNutritionProgram: stillActive,
+      };
+    });
   }, []);
 
   const setActiveNutritionProgram = useCallback((id: string | null) => {
@@ -169,15 +221,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Supplement Program management
   const addSupplementProgram = useCallback((program: SupplementProgram) => {
-    setState(prev => ({ ...prev, supplementPrograms: [...prev.supplementPrograms, program] }));
+    setState(prev => ({
+      ...prev,
+      supplementPrograms: [...prev.supplementPrograms, program],
+      activeSupplementProgram: prev.activeSupplementProgram || program.id,
+    }));
   }, []);
 
   const removeSupplementProgram = useCallback((id: string) => {
-    setState(prev => ({
-      ...prev,
-      supplementPrograms: prev.supplementPrograms.filter(p => p.id !== id),
-      activeSupplementProgram: prev.activeSupplementProgram === id ? null : prev.activeSupplementProgram
-    }));
+    setState(prev => {
+      const remaining = prev.supplementPrograms.filter(p => p.id !== id);
+      const stillActive = prev.activeSupplementProgram === id
+        ? (remaining.find(p => p.profileId === prev.activeProfileId)?.id ?? null)
+        : prev.activeSupplementProgram;
+      return {
+        ...prev,
+        supplementPrograms: remaining,
+        activeSupplementProgram: stillActive,
+      };
+    });
   }, []);
 
   const setActiveSupplementProgram = useCallback((id: string | null) => {

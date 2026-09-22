@@ -117,7 +117,7 @@ export default function ProgramImport() {
           isDark ? 'bg-[#22c55e]/20 border border-[#22c55e]/30' : 'bg-[#10b981]/15 border border-[#10b981]/30'
         }`}>
           <Check size={20} className={isDark ? 'text-[#22c55e]' : 'text-[#059669]'} />
-          <span className={`font-bold ${isDark ? 'text-[#22c55e]' : 'text-[#059669]'}`}>
+          <span className={`font-bold ${isDark ? 'text-[#22c55e]' : 'text-[#059669]'`}>
             برنامه با موفقیت وارد شد و فعال شد!
           </span>
         </div>
@@ -126,10 +126,10 @@ export default function ProgramImport() {
       <div className={`rounded-2xl p-5 border theme-transition ${
         isDark ? 'bg-[#1a1a2e] border-[#d4af37]/10' : 'bg-white border-[#14b8a6]/15'
       }`}>
-        <h3 className={`font-bold mb-3 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+        <h3 className={`font-bold mb-3 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'`}>
           JSON برنامه تمرینی
         </h3>
-        <p className={`text-sm mb-3 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+        <p className={`text-sm mb-3 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'`}>
           خروجی هوش مصنوعی را در قالب JSON وارد کنید:
         </p>
         <textarea
@@ -178,7 +178,7 @@ export default function ProgramImport() {
           <AlertCircle size={20} className={isDark ? 'text-[#ef4444]' : 'text-[#dc2626]'} />
           <div>
             <p className={`font-bold ${isDark ? 'text-[#ef4444]' : 'text-[#dc2626]'}`}>خطا در اعتبارسنجی</p>
-            <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+            <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'`}>
               {validationResult.error}
             </p>
           </div>
@@ -190,7 +190,7 @@ export default function ProgramImport() {
           isDark ? 'bg-[#1a1a2e] border-[#22c55e]/20' : 'bg-white border-[#10b981]/30'
         }`}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className={`font-bold flex items-center gap-2 ${isDark ? 'text-[#22c55e]' : 'text-[#059669]'}`}>
+            <h3 className={`font-bold flex items-center gap-2 ${isDark ? 'text-[#22c55e]' : 'text-[#059669]'`}>
               <Check size={18} />
               پیش‌نمایش برنامه
             </h3>
@@ -210,7 +210,7 @@ export default function ProgramImport() {
           <div className="space-y-4">
             <div className="flex items-center gap-4 text-sm">
               <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>نام برنامه:</span>
-              <span className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+              <span className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a']}`}>
                 {validationResult.data.program_name}
               </span>
             </div>
@@ -222,7 +222,7 @@ export default function ProgramImport() {
             </div>
             <div className="flex items-center gap-4 text-sm">
               <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>تعداد روزها:</span>
-              <span className={isDark ? 'text-white' : 'text-[#134e4a]'}>
+              <span className={isDark ? 'text-white' : 'text-[#134e4a']`}>
                 {toPersianNumber(validationResult.data.days.length)} روز
               </span>
             </div>
@@ -232,13 +232,12 @@ export default function ProgramImport() {
                 <div key={i} className={`mb-4 rounded-xl p-4 ${
                   isDark ? 'bg-[#0d0d1a]' : 'bg-[#f0fdfa]'
                 }`}>
-                  <h4 className={`font-bold mb-2 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+                  <h4 className={`font-bold mb-2 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'`}>
                     {day.day}
                   </h4>
                   <div className="flex flex-wrap gap-1 mb-3">
                     {(day.muscle_groups || []).map((mg: string, j: number) => (
-                      <span key={j} className={`px-2 py-0.5 rounded text-xs ${\n                        isDark ? 'bg-[#4a90d9]/20 text-[#4a90d9]' : 'bg-[#14b8a6]/15 text-[#0d9488]'
-                      }`}>{mg}</span>
+                      <span key={j} className={`px-2 py-0.5 rounded text-xs ${isDark ? 'bg-[#4a90d9]/20 text-[#4a90d9]' : 'bg-[#14b8a6]/15 text-[#0d9488]'}`}>{mg}</span>
                     ))}
                   </div>
                   <div className="space-y-2">
@@ -264,11 +263,11 @@ export default function ProgramImport() {
       <div className={`rounded-2xl p-5 border theme-transition ${
         isDark ? 'bg-[#1a1a2e] border-[#d4af37]/10' : 'bg-white border-[#14b8a6]/15'
       }`}>
-        <h3 className={`font-bold mb-4 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+        <h3 className={`font-bold mb-4 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'`}>
           برنامه‌های ذخیره شده ({activeProfile.name})
         </h3>
         {programs.length === 0 ? (
-          <p className={`text-sm text-center py-4 ${isDark ? 'text-gray-500' : 'text-[#0f766e]/50'}`}>
+          <p className={`text-sm text-center py-4 ${isDark ? 'text-gray-500' : 'text-[#0f766e]/50'`}>
             هنوز برنامه تمرینی برای این پروفایل وارد نشده است
           </p>
         ) : (
@@ -288,10 +287,10 @@ export default function ProgramImport() {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+                    <h4 className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a']`}>
                       {program.name}
                     </h4>
-                    <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+                    <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'`}>
                       {program.duration} • {toPersianNumber(program.days.length)} روز • {toPersianNumber(program.days.reduce((acc, d) => acc + d.exercises.length, 0))} تمرین
                     </p>
                   </div>

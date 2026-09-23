@@ -212,7 +212,7 @@ export default function Profile() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className={`text-xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+          <h2 className={'text-xl font-bold flex items-center gap-2 ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>
             <User size={22} className={isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'} />
             مدیریت پروفایل شاگردان
           </h2>
@@ -240,10 +240,10 @@ export default function Profile() {
             }`}>
               <User size={40} className={isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'} />
             </div>
-            <h3 className={`text-lg font-bold mb-2 ${isDark ? 'text-white' : 'text-[#134e4a]'`}>
+            <h3 className={'text-lg font-bold mb-2 ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>
               هنوز پروفایلی ایجاد نشده
             </h3>
-            <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'`}>
+            <p className={'text-sm mb-4 ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>
               برای شروع، اولین پروفایل شاگرد خود را ایجاد کنید
             </p>
             <button
@@ -284,10 +284,10 @@ export default function Profile() {
                       {profile.name.charAt(0)}
                     </div>
                     <div>
-                      <h3 className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'`}>
+                      <h3 className={'font-bold ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>
                         {profile.name}
                       </h3>
-                      <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'`}>
+                      <p className={'text-xs ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>
                         {toPersianNumber(profile.age)} سال • {profile.gender === 'male' ? 'مرد' : 'زن'}
                       </p>
                     </div>
@@ -303,16 +303,16 @@ export default function Profile() {
 
                 <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
                   <div className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>
-                    قد: <span className={`font-medium ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>{toPersianNumber(profile.height)} cm</span>
+                    قد: <span className={'font-medium ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>{toPersianNumber(profile.height)} cm</span>
                   </div>
                   <div className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>
-                    وزن: <span className={`font-medium ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>{toPersianNumber(profile.weight)} kg</span>
+                    وزن: <span className={'font-medium ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>{toPersianNumber(profile.weight)} kg</span>
                   </div>
                   <div className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>
-                    هدف: <span className={`font-medium ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>{getGoalLabel(profile.primaryGoal)}</span>
+                    هدف: <span className={'font-medium ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>{getGoalLabel(profile.primaryGoal)}</span>
                   </div>
                   <div className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>
-                    سطح: <span className={`font-medium ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>{EXPERIENCE_LABELS[profile.experience]}</span>
+                    سطح: <span className={'font-medium ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>{EXPERIENCE_LABELS[profile.experience]}</span>
                   </div>
                 </div>
 
@@ -371,7 +371,7 @@ export default function Profile() {
           >
             <ChevronRight size={20} />
           </button>
-          <h2 className={`text-xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-[#134e4a]'`}>
+          <h2 className={'text-xl font-bold flex items-center gap-2 ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>
             <User size={22} className={isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'} />
             {editingProfileId ? 'ویرایش پروفایل' : 'پروفایل جدید'}
           </h2>

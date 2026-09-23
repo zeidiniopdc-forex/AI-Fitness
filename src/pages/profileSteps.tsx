@@ -50,9 +50,7 @@ export function StepTraining({ form, setForm, toggleEquipment, isDark }: any) {
         <label className={'text-sm mb-2 block ' + (isDark ? 'text-gray-400' : 'text-teal-700/70')}>تجهیزات موجود</label>
         <div className="flex flex-wrap gap-2">
           {EQUIPMENT_OPTIONS.map(item => (
-            <button key={item} onClick={() => toggleEquipment(item)} className={'px-3 py-1.5 rounded-lg text-xs transition-all ' + ((form.equipment || []).includes(item) ? (isDark ? 'bg-[#d4af37] text-[#0d0d1a] font-bold' : 'bg-[#14b8a6] text-white font-bold') : (isDark ? 'bg-[#0d0d1a] text-gray-400 border border-gray-700' : 'bg-[#f0fdfa] text-teal-700/70 border border-[#14b8a6]/30'))}>
-              {item}
-            </button>
+            <button key={item} onClick={() => toggleEquipment(item)} className={'px-3 py-1.5 rounded-lg text-xs transition-all ' + ((form.equipment || []).includes(item) ? (isDark ? 'bg-[#d4af37] text-[#0d0d1a] font-bold' : 'bg-[#14b8a6] text-white font-bold') : (isDark ? 'bg-[#0d0d1a] text-gray-400 border border-gray-700' : 'bg-[#f0fdfa] text-teal-700/70 border border-[#14b8a6]/30'))}>{item}</button>
           ))}
         </div>
       </div>
@@ -78,8 +76,32 @@ export function StepTraining({ form, setForm, toggleEquipment, isDark }: any) {
 }
 
 export function StepNutrition({ form, setForm, toggleFood, isDark }: any) {
-  return <div className={'p-4 ' + (isDark ? 'text-gray-400' : 'text-teal-700/70')}>در حال بارگذاری اطلاعات تغذیه...</div>;
+  return (
+    <div className="space-y-4">
+      <h3 className={'font-bold mb-4 ' + (isDark ? 'text-[#d4af37]' : 'text-[#0d9488]')}>تغذیه</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <SelectField label="نوع رژیم" value={form.dietType} onChange={(v: string) => setForm({ ...form, dietType: v })} options={Object.entries(DIET_TYPES).map(([value, label]) => ({ value, label }))} isDark={isDark} />
+        <NumberField label="تعداد وعده در روز" value={form.mealsPerDay} onChange={(v: number) => setForm({ ...form, mealsPerDay: v })} suffix="وعده" isDark={isDark} />
+        <NumberField label="هدف کالری" value={form.calorieTarget} onChange={(v: number) => setForm({ ...form, calorieTarget: v })} suffix="kcal" isDark={isDark} />
+        <SelectField label="مهارت آشپزی" value={form.cookingSkill} onChange={(v: string) => setForm({ ...form, cookingSkill: v })} options={[{ value: 'basic', label: 'مبتدی' }, { value: 'intermediate', label: 'متوسط' }, { value: 'advanced', label: 'پیشرفته' }]} isDark={isDark} />
+      </div>
+      <div>
+        <label className={'text-sm mb-2 block ' + (isDark ? 'text-gray-400' : 'text-teal-700/70')}>حساسیت غذایی (با ویرگول)</label>
+        <textarea value={(form.foodAllergies || []).join('، ')} onChange={e => setForm({ ...form, foodAllergies: e.target.value.split('،').map((s: string) => s.trim()).filter(Boolean) })} className={'w-full border rounded-xl px-4 py-3 text-sm focus:outline-none resize-none theme-transition ' + (isDark ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]')} rows={2} placeholder="مثلاً: لبنیات، گلوتن..." />
+      </div>
+      <div>
+        <label className={'text-sm mb-2 block ' + (isDark ? 'text-gray-400' : 'text-teal-700/70')}>غذاهای مورد علاقه</label>
+        <div className="flex flex-wrap gap-2">
+          {IRANIAN_FOODS.slice(0, 20).map(food => (
+            <button key={food} onClick={() => toggleFood(food, 'favoriteFoods')} className={'px-3 py-1.5 rounded-lg text-xs transition-all ' + ((form.favoriteFoods || []).includes(food) ? (isDark ? 'bg-[#d4af37] text-[#0d0d1a] font-bold' : 'bg-[#14b8a6] text-white font-bold') : (isDark ? 'bg-[#0d0d1a] text-gray-400 border border-gray-700' : 'bg-[#f0fdfa] text-teal-700/70 border border-[#14b8a6]/30'))}>{food}</button>
+          ))}
+        </div>
+      </div>
+      <InputField label="هدف تغذیه‌ای" value={form.dietaryGoal || ''} onChange={(v: string) => setForm({ ...form, dietaryGoal: v })} isDark={isDark} placeholder="مثلاً: کاهش چربی با حفظ عضله" />
+    </div>
+  );
 }
+
 export function StepSupplements({ form, setForm, toggleSupplement, isDark }: any) {
   return <div className={'p-4 ' + (isDark ? 'text-gray-400' : 'text-teal-700/70')}>در حال بارگذاری مکمل‌ها...</div>;
 }

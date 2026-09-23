@@ -90,10 +90,10 @@ export default function SupplementImport() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <AlertCircle size={48} className={isDark ? 'text-[#f59e0b]' : 'text-[#d97706]'} />
-        <h2 className={`text-xl font-bold mt-4 mb-2 ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+        <h2 className={'text-xl font-bold mt-4 mb-2 ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>
           پروفایل انتخاب نشده
         </h2>
-        <p className={`text-center ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+        <p className={'text-center ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>
           لطفاً ابتدا یک پروفایل را انتخاب کنید
         </p>
       </div>
@@ -106,39 +106,35 @@ export default function SupplementImport() {
 
   return (
     <div className="space-y-6">
-      <h2 className={`text-2xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+      <h2 className={'text-2xl font-bold flex items-center gap-2 ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>
         <Pill size={24} className={isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'} />
         ورود برنامه مکمل
       </h2>
 
       {imported && (
-        <div className={`rounded-xl p-4 flex items-center gap-3 animate-slide-up ${
-          isDark ? 'bg-[#22c55e]/20 border border-[#22c55e]/30' : 'bg-[#10b981]/15 border border-[#10b981]/30'
-        }`}>
+        <div className={'rounded-xl p-4 flex items-center gap-3 animate-slide-up ' + (isDark ? 'bg-[#22c55e]/20 border border-[#22c55e]/30' : 'bg-[#10b981]/15 border border-[#10b981]/30')}>
           <Check size={20} className={isDark ? 'text-[#22c55e]' : 'text-[#059669]'} />
-          <span className={`font-bold ${isDark ? 'text-[#22c55e]' : 'text-[#059669]'}`}>
+          <span className={'font-bold ' + (isDark ? 'text-[#22c55e]' : 'text-[#059669]')}>
             برنامه مکمل با موفقیت وارد شد! در حال انتقال به صفحه مکمل...
           </span>
         </div>
       )}
 
-      <div className={`rounded-2xl p-5 border theme-transition ${
-        isDark ? 'bg-[#1a1a2e] border-[#d4af37]/10' : 'bg-white border-[#14b8a6]/15'
-      }`}>
-        <h3 className={`font-bold mb-3 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+      <div className={'rounded-2xl p-5 border theme-transition ' + (isDark ? 'bg-[#1a1a2e] border-[#d4af37]/10' : 'bg-white border-[#14b8a6]/15')}>
+        <h3 className={'font-bold mb-3 ' + (isDark ? 'text-[#d4af37]' : 'text-[#0d9488]')}>
           JSON برنامه مکمل
         </h3>
-        <p className={`text-sm mb-3 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+        <p className={'text-sm mb-3 ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>
           خروجی هوش مصنوعی را در قالب JSON وارد کنید:
         </p>
         <textarea
           value={jsonInput}
           onChange={e => { setJsonInput(e.target.value); setValidationResult(null); setShowPreview(false); }}
-          className={`w-full border rounded-xl px-4 py-3 text-sm font-mono focus:outline-none resize-none ${
+          className={'w-full border rounded-xl px-4 py-3 text-sm font-mono focus:outline-none resize-none ' + (
             isDark
               ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]'
               : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]'
-          }`}
+          )}
           rows={10}
           dir="ltr"
           placeholder='{"recommendation_title": "...", "supplements": [...]}'
@@ -148,22 +144,22 @@ export default function SupplementImport() {
           <button
             onClick={handleValidate}
             disabled={!jsonInput.trim()}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all ${
+            className={'flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-sm transition-all ' + (
               isDark
                 ? 'bg-[#4a90d9] text-white hover:bg-[#6bb5ff] disabled:opacity-50'
                 : 'bg-[#14b8a6] text-white hover:bg-[#0d9488] disabled:opacity-50'
-            }`}
+            )}
           >
             <Eye size={16} />
             اعتبارسنجی و پیش‌نمایش
           </button>
           <button
             onClick={() => setJsonInput(sampleJSON)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm transition-all ${
+            className={'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm transition-all ' + (
               isDark
                 ? 'bg-gray-700 text-white hover:bg-gray-600'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
+            )}
           >
             نمونه JSON
           </button>
@@ -171,13 +167,11 @@ export default function SupplementImport() {
       </div>
 
       {validationResult && !validationResult.valid && (
-        <div className={`rounded-xl p-4 flex items-start gap-3 ${
-          isDark ? 'bg-[#ef4444]/10 border border-[#ef4444]/30' : 'bg-red-50 border border-red-200'
-        }`}>
+        <div className={'rounded-xl p-4 flex items-start gap-3 ' + (isDark ? 'bg-[#ef4444]/10 border border-[#ef4444]/30' : 'bg-red-50 border border-red-200')}>
           <AlertCircle size={20} className={isDark ? 'text-[#ef4444]' : 'text-[#dc2626]'} />
           <div>
-            <p className={`font-bold ${isDark ? 'text-[#ef4444]' : 'text-[#dc2626]'}`}>خطا در اعتبارسنجی</p>
-            <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+            <p className={'font-bold ' + (isDark ? 'text-[#ef4444]' : 'text-[#dc2626]')}>خطا در اعتبارسنجی</p>
+            <p className={'text-sm mt-1 ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>
               {validationResult.error}
             </p>
           </div>
@@ -185,21 +179,19 @@ export default function SupplementImport() {
       )}
 
       {showPreview && validationResult?.valid && previewSupplements.length > 0 && (
-        <div className={`rounded-2xl p-5 border animate-slide-up ${
-          isDark ? 'bg-[#1a1a2e] border-[#22c55e]/20' : 'bg-white border-[#10b981]/30'
-        }`}>
+        <div className={'rounded-2xl p-5 border animate-slide-up ' + (isDark ? 'bg-[#1a1a2e] border-[#22c55e]/20' : 'bg-white border-[#10b981]/30')}>
           <div className="flex items-center justify-between mb-4">
-            <h3 className={`font-bold flex items-center gap-2 ${isDark ? 'text-[#22c55e]' : 'text-[#059669]'}`}>
+            <h3 className={'font-bold flex items-center gap-2 ' + (isDark ? 'text-[#22c55e]' : 'text-[#059669]')}>
               <Check size={18} />
               پیش‌نمایش برنامه
             </h3>
             <button
               onClick={handleImport}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${
+              className={'flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ' + (
                 isDark
                   ? 'bg-[#22c55e] text-white hover:bg-[#16a34a]'
                   : 'bg-[#10b981] text-white hover:bg-[#059669]'
-              }`}
+              )}
             >
               <Save size={16} />
               ذخیره برنامه
@@ -209,7 +201,7 @@ export default function SupplementImport() {
           <div className="space-y-4">
             <div className="flex items-center gap-4 text-sm">
               <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>عنوان:</span>
-              <span className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
+              <span className={'font-bold ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>
                 {validationResult.data?.recommendation_title || '—'}
               </span>
             </div>
@@ -223,7 +215,7 @@ export default function SupplementImport() {
             )}
             <div className="flex items-center gap-4 text-sm">
               <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>تعداد مکمل:</span>
-              <span className={`font-bold ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'`}>
+              <span className={'font-bold ' + (isDark ? 'text-[#d4af37]' : 'text-[#0d9488]')}>
                 {toPersianNumber(previewSupplements.length)} مورد
               </span>
             </div>
@@ -236,41 +228,39 @@ export default function SupplementImport() {
               </div>
             )}
 
-            <div className={`border-t pt-4 mt-4 ${isDark ? 'border-gray-700' : 'border-[#14b8a6]/20'}`}>
-              <h4 className={`font-bold mb-3 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
+            <div className={'border-t pt-4 mt-4 ' + (isDark ? 'border-gray-700' : 'border-[#14b8a6]/20')}>
+              <h4 className={'font-bold mb-3 ' + (isDark ? 'text-[#d4af37]' : 'text-[#0d9488]')}>
                 مکمل‌های پیشنهادی
               </h4>
               <div className="space-y-3">
                 {previewSupplements.map((supp: any, i: number) => (
-                  <div key={i} className={`rounded-xl p-4 ${
-                    isDark ? 'bg-[#0d0d1a]' : 'bg-[#f0fdfa]'
-                  }`}>
+                  <div key={i} className={'rounded-xl p-4 ' + (isDark ? 'bg-[#0d0d1a]' : 'bg-[#f0fdfa]')}>
                     <div className="flex items-center justify-between mb-2">
-                      <h5 className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
-                        {supp?.name || `مکمل ${i + 1}`}
+                      <h5 className={'font-bold ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>
+                        {supp?.name || ('مکمل ' + (i + 1))}
                       </h5>
                       {supp?.priority && (
-                        <span className={`text-xs px-2 py-1 rounded-full ${
+                        <span className={'text-xs px-2 py-1 rounded-full ' + (
                           supp.priority === 'بالا'
-                            ? isDark ? 'bg-[#22c55e]/20 text-[#22c55e]' : 'bg-[#10b981]/15 text-[#059669]'
-                            : isDark ? 'bg-[#f59e0b]/20 text-[#f59e0b]' : 'bg-amber-50 text-amber-700'
-                        }`}>
+                            ? (isDark ? 'bg-[#22c55e]/20 text-[#22c55e]' : 'bg-[#10b981]/15 text-[#059669]')
+                            : (isDark ? 'bg-[#f59e0b]/20 text-[#f59e0b]' : 'bg-amber-50 text-amber-700')
+                        )}>
                           اولویت: {supp.priority}
                         </span>
                       )}
                     </div>
                     {supp?.dosage && (
-                      <p className={`text-xs mb-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+                      <p className={'text-xs mb-1 ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>
                         دوز: {supp.dosage}
                       </p>
                     )}
                     {supp?.timing && (
-                      <p className={`text-xs mb-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+                      <p className={'text-xs mb-1 ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>
                         زمان مصرف: {supp.timing}
                       </p>
                     )}
                     {supp?.estimated_cost && (
-                      <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+                      <p className={'text-xs ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>
                         هزینه: {supp.estimated_cost}
                       </p>
                     )}

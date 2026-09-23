@@ -5,6 +5,7 @@ import { AthleteProfile, GOAL_LABELS, EXPERIENCE_LABELS, EQUIPMENT_OPTIONS, MUSC
 import { v4 as uuidv4 } from 'uuid';
 import { User, Save, ChevronLeft, ChevronRight, Check, Plus, Trash2, Edit, Dumbbell, Apple, Pill, X } from 'lucide-react';
 import { toPersianNumber } from '../utils/jalali';
+import { StepBasic, StepTraining, StepNutrition, StepSupplements, StepGoals } from './profileSteps';
 
 const steps = ['اطلاعات پایه', 'اطلاعات تمرینی', 'تغذیه', 'مکمل‌ها', 'اهداف'];
 

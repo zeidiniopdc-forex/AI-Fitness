@@ -164,7 +164,7 @@ export default function Profile() {
                   <div className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>قد: <span className={'font-medium ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>{toPersianNumber(profile.height)} cm</span></div>
                   <div className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>وزن: <span className={'font-medium ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>{toPersianNumber(profile.weight)} kg</span></div>
                   <div className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>هدف: <span className={'font-medium ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>{getGoalLabel(profile.primaryGoal)}</span></div>
-                  <div className={isDark ? 'text-gray-400' : 'text-[#0f766e']/70'}>سطح: <span className={'font-medium ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>{EXPERIENCE_LABELS[profile.experience]}</span></div>
+                  <div className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>سطح: <span className={'font-medium ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>{EXPERIENCE_LABELS[profile.experience]}</span></div>
                 </div>
                 <div className="flex gap-2">
                   {profile.id !== activeProfile?.id && (

@@ -87,7 +87,7 @@ function GoalInput({ label, value, onChange, isDark, placeholder }: { label: str
           ))}
         </div>
       )}
-      <p className={'text-xs mt-1 ' + (isDark ? 'text-gray-500' : 'text-[#0f766e]/50')}>می‌توانید هدف دلخواه خود را تایپ کنید یا از پیشنهادات انتخاب کنید</p>
+      <p className={'text-xs mt-1 ' + (isDark ? 'text-gray-500' : 'text-[#0f766e']/50')}>می‌توانید هدف دلخواه خود را تایپ کنید یا از پیشنهادات انتخاب کنید</p>
     </div>
   );
 }

@@ -101,21 +101,21 @@ export default function WorkoutTracker() {
 
   const cancelWorkout = () => { setShowCancel(false); setWorkoutStarted(false); setSession(null); setIsResting(false); setRestTimer(0); };
 
-  if (!activeProgram) return <div className="flex flex-col items-center justify-center py-20"><Dumbbell size={48} className="text-[#d4af37]" /><h2 className="text-2xl font-bold mt-4">برنامه‌ای فعال نیست</h2><button onClick={() => navigate('/import')} className="mt-6 px-5 py-3 rounded-xl font-bold bg-[#d4af37] text-black">ورود برنامه تمرینی</button></div>;
+  if (!activeProgram) return <div className="flex flex-col items-center justify-center py-20"><Dumbbell size={48} className="text-[#14b8a6]" /><h2 className="text-2xl font-bold mt-4">برنامه‌ای فعال نیست</h2><button onClick={() => navigate('/import')} className="mt-6 px-5 py-3 rounded-xl font-bold bg-[#14b8a6] text-black">ورود برنامه تمرینی</button></div>;
 
-  if (showComplete) return <div className="flex flex-col items-center justify-center py-20 text-center"><Trophy size={56} className="text-[#d4af37] mb-4" /><h2 className="text-2xl font-bold">جلسه با موفقیت ثبت شد!</h2><p className="mt-2 text-gray-400">حجم تمرین: {toPersianNumber(String(session?.totalVolume || 0))} kg</p><button onClick={() => { setShowComplete(false); setSession(null); navigate('/progress'); }} className="mt-6 px-5 py-3 rounded-xl font-bold bg-[#d4af37] text-black">مشاهده تحلیل پیشرفت</button></div>;
+  if (showComplete) return <div className="flex flex-col items-center justify-center py-20 text-center"><Trophy size={56} className="text-[#14b8a6] mb-4" /><h2 className="text-2xl font-bold">جلسه با موفقیت ثبت شد!</h2><p className="mt-2 text-gray-400">حجم تمرین: {toPersianNumber(String(session?.totalVolume || 0))} kg</p><button onClick={() => { setShowComplete(false); setSession(null); navigate('/progress'); }} className="mt-6 px-5 py-3 rounded-xl font-bold bg-[#14b8a6] text-black">مشاهده تحلیل پیشرفت</button></div>;
 
   if (!workoutStarted) return <div className="space-y-5">
-    <h2 className={`text-2xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}><Dumbbell size={24} className="text-[#d4af37]" /> ترکر حرفه‌ای تمرین</h2>
-    <div className="flex gap-2 overflow-x-auto pb-2">{activeProgram.days.map((day, i) => <button key={day.id || i} onClick={() => setSelectedDayIndex(i)} className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap ${i === selectedDayIndex ? 'bg-[#d4af37] text-black' : isDark ? 'bg-[#161616] text-gray-400' : 'bg-gray-100 text-gray-700'}`}>{day.day}</button>)}</div>
-    {selectedDay && <div className={`rounded-2xl p-5 border ${isDark ? 'bg-[#161616] border-white/5' : 'bg-white'}`}><h3 className="font-bold mb-4">{selectedDay.day}</h3>{selectedDay.exercises.map(ex => <div key={ex.id || ex.name} className="flex justify-between py-2 text-sm border-b border-gray-700/30"><span>{ex.name}</span><span className="text-gray-400">{toPersianNumber(String(ex.sets))} × {ex.reps}</span></div>)}<button onClick={startWorkout} className="w-full mt-5 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-[#d4af37] text-black"><Play size={18} /> شروع جلسه</button></div>}
+    <h2 className={`text-2xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}><Dumbbell size={24} className="text-[#14b8a6]" /> ترکر حرفه‌ای تمرین</h2>
+    <div className="flex gap-2 overflow-x-auto pb-2">{activeProgram.days.map((day, i) => <button key={day.id || i} onClick={() => setSelectedDayIndex(i)} className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap ${i === selectedDayIndex ? 'bg-[#14b8a6] text-black' : isDark ? 'bg-[#161616] text-gray-400' : 'bg-gray-100 text-gray-700'}`}>{day.day}</button>)}</div>
+    {selectedDay && <div className={`rounded-2xl p-5 border ${isDark ? 'bg-[#161616] border-white/5' : 'bg-white'}`}><h3 className="font-bold mb-4">{selectedDay.day}</h3>{selectedDay.exercises.map(ex => <div key={ex.id || ex.name} className="flex justify-between py-2 text-sm border-b border-gray-700/30"><span>{ex.name}</span><span className="text-gray-400">{toPersianNumber(String(ex.sets))} × {ex.reps}</span></div>)}<button onClick={startWorkout} className="w-full mt-5 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-[#14b8a6] text-black"><Play size={18} /> شروع جلسه</button></div>}
   </div>;
 
   const completedCount = session?.sets.filter(s => s.completed).length || 0;
   return <div className="space-y-4 pb-28">
     <div className={`sticky top-0 z-30 rounded-2xl p-4 border backdrop-blur ${isDark ? 'bg-[#161616]/95 border-white/5' : 'bg-white/95 border-gray-200'}`}>
-      <div className="flex items-center justify-between"><div><p className="text-xs text-gray-400">زمان جلسه</p><p className="text-xl font-black text-[#d4af37] tabular-nums">{formatTime(workoutTime)}</p></div><div className="text-left"><p className="text-xs text-gray-400">حجم ثبت‌شده</p><p className="font-bold">{toPersianNumber(String(session?.totalVolume || 0))} kg</p></div><button onClick={() => setShowCancel(true)} className="text-red-500 p-2"><X size={20} /></button></div>
-      <div className="mt-3 h-2 rounded-full bg-gray-700/40 overflow-hidden"><div className="h-full bg-[#d4af37] transition-all" style={{ width: `${session ? Math.round(completedCount / Math.max(session.sets.length, 1) * 100) : 0}%` }} /></div>
+      <div className="flex items-center justify-between"><div><p className="text-xs text-gray-400">زمان جلسه</p><p className="text-xl font-black text-[#14b8a6] tabular-nums">{formatTime(workoutTime)}</p></div><div className="text-left"><p className="text-xs text-gray-400">حجم ثبت‌شده</p><p className="font-bold">{toPersianNumber(String(session?.totalVolume || 0))} kg</p></div><button onClick={() => setShowCancel(true)} className="text-red-500 p-2"><X size={20} /></button></div>
+      <div className="mt-3 h-2 rounded-full bg-gray-700/40 overflow-hidden"><div className="h-full bg-[#14b8a6] transition-all" style={{ width: `${session ? Math.round(completedCount / Math.max(session.sets.length, 1) * 100) : 0}%` }} /></div>
       <p className="text-xs text-gray-400 mt-1">{toPersianNumber(String(completedCount))} از {toPersianNumber(String(session?.sets.length || 0))} ست تکمیل شده</p>
     </div>
 
@@ -126,18 +126,18 @@ export default function WorkoutTracker() {
       <div className="space-y-2">{session?.sets.filter(s => s.exerciseId === (ex.id || ex.name)).map((set, index) => {
         const globalIndex = session.sets.indexOf(set);
         const prev = previousSet(set.exerciseId, set.setNumber);
-        return <div key={set.setNumber} className={`rounded-xl p-3 ${set.completed ? isDark ? 'bg-[#d4af37]/10' : 'bg-amber-50' : isDark ? 'bg-[#0d0d1a]' : 'bg-gray-50'}`}>
+        return <div key={set.setNumber} className={`rounded-xl p-3 ${set.completed ? isDark ? 'bg-[#14b8a6]/10' : 'bg-amber-50' : isDark ? 'bg-[#0d0d1a]' : 'bg-gray-50'}`}>
           <div className="flex items-center justify-between mb-2"><span className="font-bold text-sm">ست {toPersianNumber(String(set.setNumber))}</span>{prev && <span className="text-[11px] text-gray-500">قبلی: {prev.weight}kg × {prev.actualReps}</span>}{set.completed && <Check size={17} className="text-green-500" />}</div>
           <div className="grid grid-cols-2 gap-2">
             <label className="text-[11px] text-gray-400">وزنه (kg)<input type="number" min="0" step="0.5" value={set.weight || ''} onChange={e => updateSet(globalIndex, { weight: Number(e.target.value) })} className={`mt-1 w-full rounded-lg px-2 py-2 text-sm ${isDark ? 'bg-[#090909] text-white' : 'bg-white border'}`} /></label>
             <label className="text-[11px] text-gray-400">تکرار<input type="number" min="0" value={set.actualReps || ''} onChange={e => updateSet(globalIndex, { actualReps: Number(e.target.value) })} className={`mt-1 w-full rounded-lg px-2 py-2 text-sm ${isDark ? 'bg-[#090909] text-white' : 'bg-white border'}`} /></label>
           </div>
-          {!set.completed && <button onClick={() => completeSet(globalIndex)} className="mt-2 w-full py-2 rounded-lg text-xs font-bold bg-[#d4af37] text-black">ثبت ست</button>}
+          {!set.completed && <button onClick={() => completeSet(globalIndex)} className="mt-2 w-full py-2 rounded-lg text-xs font-bold bg-[#14b8a6] text-black">ثبت ست</button>}
         </div>;
       })}</div>
     </div>)}
 
-    <button onClick={completeWorkout} className="w-full py-4 rounded-2xl font-black bg-[#d4af37] text-black flex items-center justify-center gap-2"><TrendingUp size={19} /> پایان و ثبت جلسه</button>
+    <button onClick={completeWorkout} className="w-full py-4 rounded-2xl font-black bg-[#14b8a6] text-black flex items-center justify-center gap-2"><TrendingUp size={19} /> پایان و ثبت جلسه</button>
     {showCancel && <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"><div className={`w-full max-w-sm rounded-2xl p-6 ${isDark ? 'bg-[#161616]' : 'bg-white'}`}><AlertTriangle className="mx-auto text-red-500" size={40} /><h3 className="text-center font-bold mt-3">لغو جلسه؟</h3><p className="text-center text-sm text-gray-400 mt-2">تمام اطلاعات ثبت‌نشده این جلسه از بین می‌رود.</p><div className="flex gap-2 mt-5"><button onClick={() => setShowCancel(false)} className="flex-1 py-3 rounded-xl bg-gray-700 text-white">بازگشت</button><button onClick={cancelWorkout} className="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold">لغو جلسه</button></div></div></div>}
   </div>;
 }

@@ -1,6 +1,5 @@
 import { AthleteProfile, GOAL_LABELS, EXPERIENCE_LABELS, getGoalLabel } from '../types';
 
-// Translation maps for Persian to English
 const GOAL_TRANSLATIONS: Record<string, string> = {
   'hypertrophy': 'Hypertrophy (Muscle Building)',
   'strength': 'Strength Gain',
@@ -67,6 +66,18 @@ function translateMuscle(muscle: string): string {
   return MUSCLE_TRANSLATIONS[muscle] || muscle;
 }
 
+/** Strip markdown fences and extract outermost JSON object */
+function cleanJsonInput(json: string): string {
+  let clean = (json || '').trim();
+  clean = clean.replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/\s*```$/, '');
+  const firstBrace = clean.indexOf('{');
+  const lastBrace = clean.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    clean = clean.substring(firstBrace, lastBrace + 1);
+  }
+  return clean;
+}
+
 export function generateWorkoutPrompt(profile: AthleteProfile): string {
   const goalEn = translateGoal(profile.primaryGoal);
   const secondaryGoalEn = profile.secondaryGoal ? translateGoal(profile.secondaryGoal) : null;
@@ -124,7 +135,7 @@ ${profile.exercisePreferences ? `- **Exercise Preferences**: ${profile.exerciseP
 ${profile.hormoneMedNotes ? `- **Medication / Hormone Notes**: ${profile.hormoneMedNotes}` : ''}
 
 ## Strength Records
-${Object.keys(profile.strengthRecords || {}).length > 0 
+${Object.keys(profile.strengthRecords || {}).length > 0
   ? Object.entries(profile.strengthRecords).map(([ex, w]) => `- ${ex}: ${w}`).join('\n')
   : '- No recorded strength data'}
 
@@ -148,7 +159,7 @@ The JSON must follow this EXACT structure:
   "duration": "مدت برنامه به فارسی",
   "days": [
     {
-      "day": "نام روز به فارسی (مثلاً: روز اول - سینه و پشت‌بازو)",
+      "day": "نام روز به فارسی",
       "muscle_groups": ["گروه عضلانی به فارسی"],
       "exercises": [
         {
@@ -201,7 +212,7 @@ ${(profile.dislikedFoods || []).length > 0 ? `- **Disliked Foods**: ${profile.di
 ${(profile.foodAllergies || []).length > 0 ? `- **Food Allergies**: ${profile.foodAllergies.join(', ')}` : ''}
 
 ## Cooking Ability
-${profile.cookingSkill === 'none' ? 'No cooking skills - needs very simple recipes' : 
+${profile.cookingSkill === 'none' ? 'No cooking skills - needs very simple recipes' :
   profile.cookingSkill === 'basic' ? 'Basic - can prepare simple meals' :
   profile.cookingSkill === 'intermediate' ? 'Intermediate - can prepare diverse meals' :
   'Advanced - can prepare complex meals'}
@@ -301,20 +312,28 @@ ${profile.recoveryQuality ? `- **Recovery Quality**: ${profile.recoveryQuality}`
 You MUST respond with ONLY valid JSON. No markdown, no explanations outside JSON.
 
 {
-  "plan_name": "نام برنامه مکمل به فارسی",
-  "duration": "مدت",
-  "daily_supplements": [
+  "recommendation_title": "عنوان توصیه به فارسی",
+  "summary": "خلاصه کوتاه به فارسی",
+  "supplements": [
     {
       "name": "نام مکمل به فارسی",
-      "dosage": "دوز",
+      "english_name": "English name",
+      "priority": "بالا",
+      "dosage": "دوز مصرف",
       "timing": "زمان مصرف",
+      "benefits": "فواید",
+      "side_effects": "عوارض احتمالی",
+      "estimated_cost": "هزینه تقریبی ماهانه",
+      "recommended_brands": "برندهای پیشنهادی",
       "notes": "نکات"
     }
   ],
-  "important_notes": "نکات مهم ایمنی به فارسی"
+  "total_estimated_cost": "هزینه کل ماهانه",
+  "important_notes": "نکات مهم",
+  "warnings": "هشدارها"
 }
 
-Important: All text in Persian. Safety first.
+Important: All text in Persian. Safety first. Use recommendation_title and supplements (not plan_name / daily_supplements).
 `;
 
   return prompt;
@@ -322,7 +341,7 @@ Important: All text in Persian. Safety first.
 
 export function validateWorkoutJSON(json: string): { valid: boolean; data?: any; error?: string } {
   try {
-    const data = JSON.parse(json);
+    const data = JSON.parse(cleanJsonInput(json));
     if (!data.program_name || !data.days || !Array.isArray(data.days)) {
       return { valid: false, error: 'ساختار JSON ناقص است (program_name یا days وجود ندارد)' };
     }
@@ -334,7 +353,7 @@ export function validateWorkoutJSON(json: string): { valid: boolean; data?: any;
 
 export function validateNutritionJSON(json: string): { valid: boolean; data?: any; error?: string } {
   try {
-    const data = JSON.parse(json);
+    const data = JSON.parse(cleanJsonInput(json));
     if (!data.plan_name || !data.days || !Array.isArray(data.days)) {
       return { valid: false, error: 'ساختار JSON ناقص است (plan_name یا days وجود ندارد)' };
     }
@@ -346,10 +365,61 @@ export function validateNutritionJSON(json: string): { valid: boolean; data?: an
 
 export function validateSupplementJSON(json: string): { valid: boolean; data?: any; error?: string } {
   try {
-    const data = JSON.parse(json);
-    if (!data.plan_name || !data.daily_supplements || !Array.isArray(data.daily_supplements)) {
-      return { valid: false, error: 'ساختار JSON ناقص است (plan_name یا daily_supplements وجود ندارد)' };
+    const raw = JSON.parse(cleanJsonInput(json));
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+      return { valid: false, error: 'JSON باید یک آبجکت باشد' };
     }
+
+    // Normalize both schemas:
+    // UI schema: recommendation_title + supplements
+    // legacy/prompt schema: plan_name + daily_supplements
+    const title =
+      (typeof raw.recommendation_title === 'string' && raw.recommendation_title) ||
+      (typeof raw.plan_name === 'string' && raw.plan_name) ||
+      '';
+
+    let list: any[] = [];
+    if (Array.isArray(raw.supplements)) list = raw.supplements;
+    else if (Array.isArray(raw.daily_supplements)) list = raw.daily_supplements;
+
+    if (!title) {
+      return { valid: false, error: 'فیلد recommendation_title (یا plan_name) الزامی است' };
+    }
+    if (!list.length) {
+      return { valid: false, error: 'فیلد supplements باید آرایه‌ای غیرخالی از مکمل‌ها باشد' };
+    }
+
+    const supplements = list.map((s: any, i: number) => {
+      if (!s || typeof s !== 'object') {
+        throw new Error(`مکمل ${i + 1} نامعتبر است`);
+      }
+      const name = s.name || s.supplement_name || '';
+      if (!name) {
+        throw new Error(`مکمل ${i + 1}: فیلد name الزامی است`);
+      }
+      return {
+        name: String(name),
+        english_name: s.english_name ? String(s.english_name) : '',
+        priority: s.priority ? String(s.priority) : 'متوسط',
+        dosage: s.dosage ? String(s.dosage) : '',
+        timing: s.timing ? String(s.timing) : '',
+        benefits: s.benefits ? String(s.benefits) : '',
+        side_effects: s.side_effects ? String(s.side_effects) : '',
+        estimated_cost: s.estimated_cost ? String(s.estimated_cost) : '',
+        recommended_brands: s.recommended_brands ? String(s.recommended_brands) : '',
+        notes: s.notes ? String(s.notes) : '',
+      };
+    });
+
+    const data = {
+      recommendation_title: title,
+      summary: raw.summary ? String(raw.summary) : '',
+      supplements,
+      total_estimated_cost: raw.total_estimated_cost ? String(raw.total_estimated_cost) : '',
+      important_notes: raw.important_notes ? String(raw.important_notes) : '',
+      warnings: raw.warnings ? String(raw.warnings) : '',
+    };
+
     return { valid: true, data };
   } catch (e) {
     return { valid: false, error: 'فرمت JSON نامعتبر است: ' + (e as Error).message };

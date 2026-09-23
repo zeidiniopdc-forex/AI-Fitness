@@ -59,6 +59,8 @@ jobs:
           # Capacitor regenerates android/; copy adaptive icons from native-assets
           RES=android/app/src/main/res
           mkdir -p "$RES/drawable" "$RES/mipmap-anydpi-v26" "$RES/values"
+          # Avoid Duplicate resources: Capacitor ships values/ic_launcher_background.xml
+          rm -f "$RES/values/ic_launcher_background.xml"
           cp -f native-assets/android/drawable/* "$RES/drawable/"
           cp -f native-assets/android/mipmap-anydpi-v26/* "$RES/mipmap-anydpi-v26/"
           cp -f native-assets/android/values/ic_launcher_colors.xml "$RES/values/"

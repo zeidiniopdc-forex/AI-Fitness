@@ -19,23 +19,33 @@ export default function SupplementImport() {
   const [imported, setImported] = useState(false);
 
   const handleValidate = () => {
-    const result = validateSupplementJSON(jsonInput);
-    setValidationResult(result);
-    if (result.valid) {
-      setShowPreview(true);
+    try {
+      const result = validateSupplementJSON(jsonInput);
+      setValidationResult(result);
+      setShowPreview(!!(result.valid && result.data && Array.isArray(result.data.supplements)));
+    } catch (e: any) {
+      setShowPreview(false);
+      setValidationResult({
+        valid: false,
+        error: 'خطا در اعتبارسنجی: ' + (e?.message || 'نامشخص'),
+      });
     }
   };
 
   const handleImport = () => {
     if (!validationResult?.valid || !validationResult.data || !activeProfile) return;
-    
+    const supplements = Array.isArray(validationResult.data.supplements)
+      ? validationResult.data.supplements
+      : [];
+    if (!supplements.length) return;
+
     const programId = uuidv4();
     const program: SupplementProgram = {
       id: programId,
       profileId: activeProfile.id,
-      recommendation_title: validationResult.data.recommendation_title,
+      recommendation_title: validationResult.data.recommendation_title || 'برنامه مکمل',
       summary: validationResult.data.summary || '',
-      supplements: validationResult.data.supplements || [],
+      supplements,
       total_estimated_cost: validationResult.data.total_estimated_cost || '',
       important_notes: validationResult.data.important_notes || '',
       warnings: validationResult.data.warnings || '',
@@ -90,6 +100,10 @@ export default function SupplementImport() {
     );
   }
 
+  const previewSupplements = Array.isArray(validationResult?.data?.supplements)
+    ? validationResult!.data.supplements
+    : [];
+
   return (
     <div className="space-y-6">
       <h2 className={`text-2xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
@@ -121,15 +135,15 @@ export default function SupplementImport() {
           value={jsonInput}
           onChange={e => { setJsonInput(e.target.value); setValidationResult(null); setShowPreview(false); }}
           className={`w-full border rounded-xl px-4 py-3 text-sm font-mono focus:outline-none resize-none ${
-            isDark 
-              ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' 
+            isDark
+              ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]'
               : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]'
           }`}
           rows={10}
           dir="ltr"
           placeholder='{"recommendation_title": "...", "supplements": [...]}'
         />
-        
+
         <div className="flex gap-3 mt-4">
           <button
             onClick={handleValidate}
@@ -146,8 +160,8 @@ export default function SupplementImport() {
           <button
             onClick={() => setJsonInput(sampleJSON)}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm transition-all ${
-              isDark 
-                ? 'bg-gray-700 text-white hover:bg-gray-600' 
+              isDark
+                ? 'bg-gray-700 text-white hover:bg-gray-600'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
@@ -170,7 +184,7 @@ export default function SupplementImport() {
         </div>
       )}
 
-      {showPreview && validationResult?.valid && (
+      {showPreview && validationResult?.valid && previewSupplements.length > 0 && (
         <div className={`rounded-2xl p-5 border animate-slide-up ${
           isDark ? 'bg-[#1a1a2e] border-[#22c55e]/20' : 'bg-white border-[#10b981]/30'
         }`}>
@@ -191,63 +205,75 @@ export default function SupplementImport() {
               ذخیره برنامه
             </button>
           </div>
-          
+
           <div className="space-y-4">
             <div className="flex items-center gap-4 text-sm">
               <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>عنوان:</span>
               <span className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
-                {validationResult.data.recommendation_title}
+                {validationResult.data?.recommendation_title || '—'}
               </span>
             </div>
-            <div className="flex items-center gap-4 text-sm">
-              <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>خلاصه:</span>
-              <span className={isDark ? 'text-white' : 'text-[#134e4a]'}>
-                {validationResult.data.summary}
-              </span>
-            </div>
+            {validationResult.data?.summary && (
+              <div className="flex items-center gap-4 text-sm">
+                <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>خلاصه:</span>
+                <span className={isDark ? 'text-white' : 'text-[#134e4a]'}>
+                  {validationResult.data.summary}
+                </span>
+              </div>
+            )}
             <div className="flex items-center gap-4 text-sm">
               <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>تعداد مکمل:</span>
-              <span className={`font-bold ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
-                {toPersianNumber(validationResult.data.supplements.length)} مورد
+              <span className={`font-bold ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'`}>
+                {toPersianNumber(previewSupplements.length)} مورد
               </span>
             </div>
-            <div className="flex items-center gap-4 text-sm">
-              <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>هزینه ماهانه:</span>
-              <span className={isDark ? 'text-white' : 'text-[#134e4a]'}>
-                {validationResult.data.total_estimated_cost}
-              </span>
-            </div>
+            {validationResult.data?.total_estimated_cost && (
+              <div className="flex items-center gap-4 text-sm">
+                <span className={isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}>هزینه ماهانه:</span>
+                <span className={isDark ? 'text-white' : 'text-[#134e4a]'}>
+                  {validationResult.data.total_estimated_cost}
+                </span>
+              </div>
+            )}
 
             <div className={`border-t pt-4 mt-4 ${isDark ? 'border-gray-700' : 'border-[#14b8a6]/20'}`}>
               <h4 className={`font-bold mb-3 ${isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'}`}>
                 مکمل‌های پیشنهادی
               </h4>
               <div className="space-y-3">
-                {validationResult.data.supplements.map((supp: any, i: number) => (
+                {previewSupplements.map((supp: any, i: number) => (
                   <div key={i} className={`rounded-xl p-4 ${
                     isDark ? 'bg-[#0d0d1a]' : 'bg-[#f0fdfa]'
                   }`}>
                     <div className="flex items-center justify-between mb-2">
                       <h5 className={`font-bold ${isDark ? 'text-white' : 'text-[#134e4a]'}`}>
-                        {supp.name}
+                        {supp?.name || `مکمل ${i + 1}`}
                       </h5>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        supp.priority === 'بالا' 
-                          ? isDark ? 'bg-[#22c55e]/20 text-[#22c55e]' : 'bg-[#10b981]/15 text-[#059669]'
-                          : isDark ? 'bg-[#f59e0b]/20 text-[#f59e0b]' : 'bg-amber-50 text-amber-700'
-                      }`}>
-                        اولویت: {supp.priority}
-                      </span>
+                      {supp?.priority && (
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          supp.priority === 'بالا'
+                            ? isDark ? 'bg-[#22c55e]/20 text-[#22c55e]' : 'bg-[#10b981]/15 text-[#059669]'
+                            : isDark ? 'bg-[#f59e0b]/20 text-[#f59e0b]' : 'bg-amber-50 text-amber-700'
+                        }`}>
+                          اولویت: {supp.priority}
+                        </span>
+                      )}
                     </div>
-                    <p className={`text-xs mb-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
-                      دوز: {supp.dosage}
-                    </p>
-                    <p className={`text-xs mb-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
-                      زمان مصرف: {supp.timing}
-                    </p>
-                    <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
-                      هزینه: {supp.estimated_cost}
-                    </p>
+                    {supp?.dosage && (
+                      <p className={`text-xs mb-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+                        دوز: {supp.dosage}
+                      </p>
+                    )}
+                    {supp?.timing && (
+                      <p className={`text-xs mb-1 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+                        زمان مصرف: {supp.timing}
+                      </p>
+                    )}
+                    {supp?.estimated_cost && (
+                      <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'}`}>
+                        هزینه: {supp.estimated_cost}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>

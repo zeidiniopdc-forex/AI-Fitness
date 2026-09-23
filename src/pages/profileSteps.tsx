@@ -103,10 +103,51 @@ export function StepNutrition({ form, setForm, toggleFood, isDark }: any) {
 }
 
 export function StepSupplements({ form, setForm, toggleSupplement, isDark }: any) {
-  return <div className={'p-4 ' + (isDark ? 'text-gray-400' : 'text-teal-700/70')}>در حال بارگذاری مکمل‌ها...</div>;
+  return (
+    <div className="space-y-4">
+      <h3 className={'font-bold mb-4 ' + (isDark ? 'text-[#d4af37]' : 'text-[#0d9488]')}>مکمل‌ها</h3>
+      <InputField label="هدف از مصرف مکمل" value={form.supplementGoal || ''} onChange={(v: string) => setForm({ ...form, supplementGoal: v })} isDark={isDark} placeholder="مثلاً: افزایش عضله، ریکاوری" />
+      <InputField label="بودجه ماهانه مکمل" value={form.supplementBudget || ''} onChange={(v: string) => setForm({ ...form, supplementBudget: v })} isDark={isDark} placeholder="مثلاً: ۵۰۰ هزار تومان" />
+      <div>
+        <label className={'text-sm mb-2 block ' + (isDark ? 'text-gray-400' : 'text-teal-700/70')}>مکمل‌های فعلی</label>
+        <div className="flex flex-wrap gap-2">
+          {SUPPLEMENT_CATEGORIES.map(s => (
+            <button key={s} onClick={() => toggleSupplement(s)} className={'px-3 py-1.5 rounded-lg text-xs transition-all ' + ((form.currentSupplements || []).includes(s) ? (isDark ? 'bg-[#d4af37] text-[#0d0d1a] font-bold' : 'bg-[#14b8a6] text-white font-bold') : (isDark ? 'bg-[#0d0d1a] text-gray-400 border border-gray-700' : 'bg-[#f0fdfa] text-teal-700/70 border border-[#14b8a6]/30'))}>{s}</button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <label className={'text-sm mb-2 block ' + (isDark ? 'text-gray-400' : 'text-teal-700/70')}>شرایط پزشکی (با ویرگول)</label>
+        <textarea value={(form.healthConditions || []).join('، ')} onChange={e => setForm({ ...form, healthConditions: e.target.value.split('،').map((s: string) => s.trim()).filter(Boolean) })} className={'w-full border rounded-xl px-4 py-3 text-sm focus:outline-none resize-none theme-transition ' + (isDark ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]')} rows={2} placeholder="مثلاً: فشار خون، دیابت..." />
+      </div>
+    </div>
+  );
 }
+
 export function StepGoals({ form, setForm, toggleTargetMuscle, isDark }: any) {
-  return <div className={'p-4 ' + (isDark ? 'text-gray-400' : 'text-teal-700/70')}>در حال بارگذاری اهداف...</div>;
+  return (
+    <div className="space-y-4">
+      <h3 className={'font-bold mb-4 ' + (isDark ? 'text-[#d4af37]' : 'text-[#0d9488]')}>اهداف</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <SelectField label="هدف اصلی" value={form.primaryGoal} onChange={(v: string) => setForm({ ...form, primaryGoal: v })} options={Object.entries(GOAL_LABELS).map(([value, label]) => ({ value, label }))} isDark={isDark} />
+        <SelectField label="نوع برنامه" value={form.programType} onChange={(v: string) => setForm({ ...form, programType: v })} options={Object.entries(PROGRAM_TYPES).map(([value, label]) => ({ value, label }))} isDark={isDark} />
+      </div>
+      <InputField label="هدف فرعی" value={form.secondaryGoal || ''} onChange={(v: string) => setForm({ ...form, secondaryGoal: v })} isDark={isDark} placeholder="اختیاری" />
+      <InputField label="بازه زمانی" value={form.timeline || ''} onChange={(v: string) => setForm({ ...form, timeline: v })} isDark={isDark} placeholder="مثلاً: ۳ ماه" />
+      <div>
+        <label className={'text-sm mb-2 block ' + (isDark ? 'text-gray-400' : 'text-teal-700/70')}>عضلات هدف</label>
+        <div className="flex flex-wrap gap-2">
+          {MUSCLE_GROUPS.map(m => (
+            <button key={m} onClick={() => toggleTargetMuscle(m)} className={'px-3 py-1.5 rounded-lg text-xs transition-all ' + ((form.targetMuscles || []).includes(m) ? (isDark ? 'bg-[#d4af37] text-[#0d0d1a] font-bold' : 'bg-[#14b8a6] text-white font-bold') : (isDark ? 'bg-[#0d0d1a] text-gray-400 border border-gray-700' : 'bg-[#f0fdfa] text-teal-700/70 border border-[#14b8a6]/30'))}>{m}</button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <label className={'text-sm mb-2 block ' + (isDark ? 'text-gray-400' : 'text-teal-700/70')}>سابقه تمرینی</label>
+        <textarea value={form.trainingHistory || ''} onChange={e => setForm({ ...form, trainingHistory: e.target.value })} className={'w-full border rounded-xl px-4 py-3 text-sm focus:outline-none resize-none theme-transition ' + (isDark ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]')} rows={3} placeholder="توضیح مختصر سابقه تمرین..." />
+      </div>
+    </div>
+  );
 }
 
 function InputField({ label, value, onChange, isDark, placeholder }: { label: string; value: string; onChange: (v: string) => void; isDark: boolean; placeholder?: string }) {

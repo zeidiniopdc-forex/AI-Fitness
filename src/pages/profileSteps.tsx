@@ -32,19 +32,19 @@ export function StepTraining({ form, setForm, toggleEquipment, isDark }: any) {
   return <div className={'p-4 ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>در حال بارگذاری اطلاعات تمرینی...</div>;
 }
 export function StepNutrition({ form, setForm, toggleFood, isDark }: any) {
-  return <div className={'p-4 ' + (isDark ? 'text-gray-400' : 'text-[#0f766e']/70')}>در حال بارگذاری اطلاعات تغذیه...</div>;
+  return <div className={'p-4 ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>در حال بارگذاری اطلاعات تغذیه...</div>;
 }
 export function StepSupplements({ form, setForm, toggleSupplement, isDark }: any) {
-  return <div className={'p-4 ' + (isDark ? 'text-gray-400' : 'text-[#0f766e']/70')}>در حال بارگذاری مکمل‌ها...</div>;
+  return <div className={'p-4 ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>در حال بارگذاری مکمل‌ها...</div>;
 }
 export function StepGoals({ form, setForm, toggleTargetMuscle, isDark }: any) {
-  return <div className={'p-4 ' + (isDark ? 'text-gray-400' : 'text-[#0f766e']/70')}>در حال بارگذاری اهداف...</div>;
+  return <div className={'p-4 ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>در حال بارگذاری اهداف...</div>;
 }
 
 function InputField({ label, value, onChange, isDark, placeholder }: { label: string; value: string; onChange: (v: string) => void; isDark: boolean; placeholder?: string }) {
   return (
     <div>
-      <label className={'text-sm mb-1 block ' + (isDark ? 'text-gray-400' : 'text-[#0f766e']/70')}>{label}</label>
+      <label className={'text-sm mb-1 block ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>{label}</label>
       <input type="text" value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder} className={'w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none theme-transition ' + (isDark ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]')} />
     </div>
   );
@@ -53,7 +53,7 @@ function InputField({ label, value, onChange, isDark, placeholder }: { label: st
 function NumberField({ label, value, onChange, suffix, isDark }: { label: string; value: number; onChange: (v: number) => void; suffix?: string; isDark: boolean }) {
   return (
     <div>
-      <label className={'text-sm mb-1 block ' + (isDark ? 'text-gray-400' : 'text-[#0f766e']/70')}>{label}{suffix ? ' (' + suffix + ')' : ''}</label>
+      <label className={'text-sm mb-1 block ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>{label}{suffix ? ' (' + suffix + ')' : ''}</label>
       <input type="number" value={value || ''} onChange={e => onChange(Number(e.target.value))} className={'w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none theme-transition ' + (isDark ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]')} />
     </div>
   );
@@ -87,7 +87,7 @@ function GoalInput({ label, value, onChange, isDark, placeholder }: { label: str
           ))}
         </div>
       )}
-      <p className={'text-xs mt-1 ' + (isDark ? 'text-gray-500' : 'text-[#0f766e']/50')}>می‌توانید هدف دلخواه خود را تایپ کنید یا از پیشنهادات انتخاب کنید</p>
+      <p className={'text-xs mt-1 ' + (isDark ? 'text-gray-500' : 'text-[#0f766e]/50')}>می‌توانید هدف دلخواه خود را تایپ کنید یا از پیشنهادات انتخاب کنید</p>
     </div>
   );
 }

@@ -105,16 +105,54 @@ export default function WorkoutTracker() {
 
   if (showComplete) return <div className="flex flex-col items-center justify-center py-20 text-center"><Trophy size={56} className="text-[#14b8a6] mb-4" /><h2 className="text-2xl font-bold">جلسه با موفقیت ثبت شد!</h2><p className="mt-2 text-gray-400">حجم تمرین: {toPersianNumber(String(session?.totalVolume || 0))} kg</p><button onClick={() => { setShowComplete(false); setSession(null); navigate('/progress'); }} className="mt-6 px-5 py-3 rounded-xl font-bold bg-[#14b8a6] text-black">مشاهده تحلیل پیشرفت</button></div>;
 
+  const targetMuscles = selectedDay?.muscleGroups || selectedDay?.muscle_groups || [];
+
   if (!workoutStarted) return <div className="space-y-5">
     <h2 className={`text-2xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-900'}`}><Dumbbell size={24} className="text-[#14b8a6]" /> ترکر حرفه‌ای تمرین</h2>
     <div className="flex gap-2 overflow-x-auto pb-2">{activeProgram.days.map((day, i) => <button key={day.id || i} onClick={() => setSelectedDayIndex(i)} className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap ${i === selectedDayIndex ? 'bg-[#14b8a6] text-black' : isDark ? 'bg-[#161616] text-gray-400' : 'bg-gray-100 text-gray-700'}`}>{day.day}</button>)}</div>
-    {selectedDay && <div className={`rounded-2xl p-5 border ${isDark ? 'bg-[#161616] border-white/5' : 'bg-white'}`}><h3 className="font-bold mb-4">{selectedDay.day}</h3>{selectedDay.exercises.map(ex => <div key={ex.id || ex.name} className="flex justify-between py-2 text-sm border-b border-gray-700/30"><span>{ex.name}</span><span className="text-gray-400">{toPersianNumber(String(ex.sets))} × {ex.reps}</span></div>)}<button onClick={startWorkout} className="w-full mt-5 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-[#14b8a6] text-black"><Play size={18} /> شروع جلسه</button></div>}
+    {selectedDay && <div className={`rounded-2xl p-5 border ${isDark ? 'bg-[#161616] border-white/5' : 'bg-white'}`}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-gray-700/30">
+        <h3 className="font-bold text-lg">{selectedDay.day}</h3>
+        {targetMuscles.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs text-gray-400">عضلات هدف:</span>
+            {targetMuscles.map((m, idx) => (
+              <span key={idx} className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-[#14b8a6]/20 text-[#14b8a6]">
+                {m}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+      {selectedDay.exercises.map(ex => <div key={ex.id || ex.name} className="flex justify-between py-2 text-sm border-b border-gray-700/30"><span>{ex.name}</span><span className="text-gray-400">{toPersianNumber(String(ex.sets))} × {ex.reps}</span></div>)}
+      <button onClick={startWorkout} className="w-full mt-5 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-[#14b8a6] text-black"><Play size={18} /> شروع جلسه</button>
+    </div>}
   </div>;
 
   const completedCount = session?.sets.filter(s => s.completed).length || 0;
   return <div className="space-y-4 pb-28">
     <div className={`sticky top-0 z-30 rounded-2xl p-4 border backdrop-blur ${isDark ? 'bg-[#161616]/95 border-white/5' : 'bg-white/95 border-gray-200'}`}>
-      <div className="flex items-center justify-between"><div><p className="text-xs text-gray-400">زمان جلسه</p><p className="text-xl font-black text-[#14b8a6] tabular-nums">{formatTime(workoutTime)}</p></div><div className="text-left"><p className="text-xs text-gray-400">حجم ثبت‌شده</p><p className="font-bold">{toPersianNumber(String(session?.totalVolume || 0))} kg</p></div><button onClick={() => setShowCancel(true)} className="text-red-500 p-2"><X size={20} /></button></div>
+      <div className="flex items-center justify-between mb-2">
+        <div>
+          <h3 className="font-bold text-base">{session?.dayName || selectedDay?.day}</h3>
+          {targetMuscles.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1 mt-1">
+              <span className="text-[11px] text-gray-400">عضلات هدف:</span>
+              {targetMuscles.map((m, idx) => (
+                <span key={idx} className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#14b8a6]/20 text-[#14b8a6]">
+                  {m}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        <button onClick={() => setShowCancel(true)} className="text-red-500 p-2 shrink-0"><X size={20} /></button>
+      </div>
+
+      <div className="flex items-center justify-between border-t border-gray-700/20 pt-2">
+        <div><p className="text-xs text-gray-400">زمان جلسه</p><p className="text-xl font-black text-[#14b8a6] tabular-nums">{formatTime(workoutTime)}</p></div>
+        <div className="text-left"><p className="text-xs text-gray-400">حجم ثبت‌شده</p><p className="font-bold">{toPersianNumber(String(session?.totalVolume || 0))} kg</p></div>
+      </div>
       <div className="mt-3 h-2 rounded-full bg-gray-700/40 overflow-hidden"><div className="h-full bg-[#14b8a6] transition-all" style={{ width: `${session ? Math.round(completedCount / Math.max(session.sets.length, 1) * 100) : 0}%` }} /></div>
       <p className="text-xs text-gray-400 mt-1">{toPersianNumber(String(completedCount))} از {toPersianNumber(String(session?.sets.length || 0))} ست تکمیل شده</p>
     </div>

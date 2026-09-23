@@ -239,7 +239,7 @@ export default function Profile() {
             }`}>
               <User size={40} className={isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'} />
             </div>
-            <h3 className={`text-lg font-bold mb-2 ${isDark ? 'text-white' : 'text-[#134e4a']}`}>
+            <h3 className={`text-lg font-bold mb-2 ${isDark ? 'text-white' : 'text-[#134e4a']`}>
               هنوز پروفایلی ایجاد نشده
             </h3>
             <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'`}>
@@ -511,3 +511,5 @@ function StepBasic({ form, setForm, isDark }: any) {
     </div>
   );
 }
+
+/* REST_OF_FILE_MARKER - will append */

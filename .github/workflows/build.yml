@@ -54,6 +54,16 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
+      - name: Apply Coachino launcher icons
+        run: |
+          # Capacitor regenerates android/; copy adaptive icons from native-assets
+          RES=android/app/src/main/res
+          mkdir -p "$RES/drawable" "$RES/mipmap-anydpi-v26" "$RES/values"
+          cp -f native-assets/android/drawable/* "$RES/drawable/"
+          cp -f native-assets/android/mipmap-anydpi-v26/* "$RES/mipmap-anydpi-v26/"
+          cp -f native-assets/android/values/ic_launcher_colors.xml "$RES/values/"
+          echo "✅ Coachino launcher icons applied"
+
       - name: Update Gradle Wrapper
         run: |
           cd android

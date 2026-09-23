@@ -68,10 +68,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <h1 className={'font-bold text-base sm:text-lg leading-tight ' + (
                   isDark ? 'text-white' : 'text-[#0d9488]'
                 )}>
-                  ای‌آی فیتنس
+                  کوچینو
                 </h1>
                 <p className={'text-[10px] sm:text-xs ' + (isDark ? 'text-gray-500' : 'text-[#0f766e]/70')}>
-                  {getPersianDate()}
+                  Coachino · {getPersianDate()}
                 </p>
               </div>
             </div>
@@ -137,8 +137,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <Dumbbell size={24} className={isDark ? 'text-[#0a0a0a]' : 'text-white'} />
                 </div>
                 <div>
-                  <span className={'font-bold text-lg block ' + (isDark ? 'text-white' : 'text-[#0d9488]')}>ای‌آی فیتنس</span>
-                  <span className={'text-xs ' + (isDark ? 'text-gray-500' : 'text-[#0f766e]/70')}>دستیار هوشمند بدنسازی</span>
+                  <span className={'font-bold text-lg block ' + (isDark ? 'text-white' : 'text-[#0d9488]')}>کوچینو</span>
+                  <span className={'text-xs ' + (isDark ? 'text-gray-500' : 'text-[#0f766e]/70')}>Coachino · دستیار هوشمند بدنسازی</span>
                 </div>
               </div>
               {navItems.map(item => {

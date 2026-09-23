@@ -37,38 +37,27 @@ export interface AthleteProfile {
   currentSupplements: string[];
   supplementBudget: string;
   healthConditions: string[];
-  /** Approximate body fat percentage */
   bodyFatPercent?: number;
-  /** lean | athletic | average | overweight | obese */
   bodyComposition?: string;
-  /** Average sleep hours per night */
   sleepHours?: number;
-  /** poor | fair | good | excellent */
   recoveryQuality?: string;
-  /** low | moderate | high */
   jobStress?: string;
-  /** normal | shift | night | irregular */
   workShift?: string;
-  /** Detailed injury history (free text) */
   injuryDetails?: string;
-  /** Preferred exercise styles/equipment (e.g. barbell, cables) */
   preferredExercises?: string[];
-  /** Free-text exercise preferences */
   exercisePreferences?: string;
-  /** Medications / hormone notes (optional, sensitive) */
   hormoneMedNotes?: string;
-  /** Competition or hard deadline date (ISO or free text) */
   competitionDate?: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export type Goal = 
-  | 'hypertrophy' 
-  | 'strength' 
-  | 'fat_loss' 
-  | 'recomposition' 
-  | 'competition' 
+export type Goal =
+  | 'hypertrophy'
+  | 'strength'
+  | 'fat_loss'
+  | 'recomposition'
+  | 'competition'
   | 'general_fitness';
 
 export interface BodyMeasurements {
@@ -131,21 +120,29 @@ export interface Food {
   fats: number;
 }
 
+export interface Supplement {
+  name: string;
+  english_name?: string;
+  priority?: string;
+  dosage?: string;
+  timing?: string;
+  benefits?: string;
+  side_effects?: string;
+  estimated_cost?: string;
+  recommended_brands?: string;
+  notes?: string;
+}
+
 export interface SupplementProgram {
   id: string;
   profileId: string;
-  plan_name: string;
-  duration: string;
-  daily_supplements: DailySupplement[];
+  recommendation_title: string;
+  summary?: string;
+  supplements: Supplement[];
+  total_estimated_cost?: string;
   important_notes?: string;
+  warnings?: string;
   createdAt: string;
-}
-
-export interface DailySupplement {
-  name: string;
-  dosage: string;
-  timing: string;
-  notes?: string;
 }
 
 export interface WorkoutDay {

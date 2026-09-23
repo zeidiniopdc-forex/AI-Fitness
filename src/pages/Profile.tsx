@@ -3,7 +3,7 @@ import { useAppContext } from '../context/AppContext';
 import { useTheme } from '../context/ThemeContext';
 import { AthleteProfile, GOAL_LABELS, EXPERIENCE_LABELS, EQUIPMENT_OPTIONS, MUSCLE_GROUPS, PROGRAM_TYPES, ACTIVITY_LEVELS, EQUIPMENT_TYPES, DIET_TYPES, IRANIAN_FOODS, SUPPLEMENT_CATEGORIES, getGoalLabel } from '../types';
 import { v4 as uuidv4 } from 'uuid';
-import { User, Save, ChevronLeft, ChevronRight, Check, Plus, Trash2, Edit, Dumbbell, Apple, Pill, X } from 'lucide-react';
+import { User, Save, ChevronLeft, ChevronRight, Check, Plus, Trash2, Edit, Dumbbell, Apple, Pill, X, Download, Upload, Copy } from 'lucide-react';
 import { toPersianNumber } from '../utils/jalali';
 import { StepBasic, StepTraining, StepNutrition, StepSupplements, StepGoals } from './profileSteps';
 
@@ -17,6 +17,11 @@ export default function Profile() {
   const [saved, setSaved] = useState(false);
   const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
   const [showNewProfileForm, setShowNewProfileForm] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [importJson, setImportJson] = useState('');
+  const [importError, setImportError] = useState('');
+  const [importOk, setImportOk] = useState(false);
+  const [exportMsg, setExportMsg] = useState('');
   
   const [form, setForm] = useState<Partial<AthleteProfile>>({
     name: '', age: 25, gender: 'male', height: 175, weight: 75,
@@ -118,6 +123,104 @@ export default function Profile() {
     setForm({ ...form, currentSupplements: current.includes(supp) ? current.filter(s => s !== supp) : [...current, supp] });
   };
 
+  const handleExportProfile = (profile: AthleteProfile) => {
+    try {
+      const json = JSON.stringify(profile, null, 2);
+      const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `profile-${(profile.name || 'athlete').replace(/\s+/g, '-')}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setExportMsg('دانلود شد');
+      setTimeout(() => setExportMsg(''), 2000);
+    } catch (e) {
+      alert('خطا در خروجی JSON');
+    }
+  };
+
+  const handleCopyProfile = async (profile: AthleteProfile) => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(profile, null, 2));
+      setExportMsg('کپی شد');
+      setTimeout(() => setExportMsg(''), 2000);
+    } catch {
+      alert('کپی به کلیپ‌بورد ممکن نشد');
+    }
+  };
+
+  const handleImportProfile = () => {
+    setImportError('');
+    setImportOk(false);
+    const raw = importJson.trim();
+    if (!raw) {
+      setImportError('متن JSON خالی است');
+      return;
+    }
+    try {
+      const data = JSON.parse(raw);
+      if (!data || typeof data !== 'object' || Array.isArray(data)) {
+        setImportError('JSON باید یک آبجکت پروفایل باشد');
+        return;
+      }
+      const profile: AthleteProfile = {
+        id: uuidv4(),
+        name: data.name || 'ورزشکار واردشده',
+        age: Number(data.age) || 25,
+        gender: data.gender === 'female' ? 'female' : 'male',
+        height: Number(data.height) || 175,
+        weight: Number(data.weight) || 75,
+        targetWeight: data.targetWeight != null ? Number(data.targetWeight) : undefined,
+        activityLevel: data.activityLevel || 'moderate',
+        experience: data.experience || 'intermediate',
+        trainingDays: Number(data.trainingDays) || 4,
+        sessionDuration: Number(data.sessionDuration) || 60,
+        location: data.location || 'gym',
+        equipmentType: data.equipmentType || 'full_gym',
+        customEquipment: Array.isArray(data.customEquipment) ? data.customEquipment : [],
+        equipment: Array.isArray(data.equipment) ? data.equipment : [],
+        injuries: Array.isArray(data.injuries) ? data.injuries : [],
+        limitations: Array.isArray(data.limitations) ? data.limitations : [],
+        avoidedExercises: Array.isArray(data.avoidedExercises) ? data.avoidedExercises : [],
+        primaryGoal: data.primaryGoal || 'hypertrophy',
+        secondaryGoal: data.secondaryGoal,
+        targetMuscles: Array.isArray(data.targetMuscles) ? data.targetMuscles : [],
+        programType: data.programType || 'full_body',
+        timeline: data.timeline || '',
+        trainingHistory: data.trainingHistory || '',
+        strengthRecords: data.strengthRecords && typeof data.strengthRecords === 'object' ? data.strengthRecords : {},
+        bodyMeasurements: data.bodyMeasurements && typeof data.bodyMeasurements === 'object' ? data.bodyMeasurements : {},
+        dietaryGoal: data.dietaryGoal || '',
+        dietType: data.dietType || '',
+        foodAllergies: Array.isArray(data.foodAllergies) ? data.foodAllergies : [],
+        favoriteFoods: Array.isArray(data.favoriteFoods) ? data.favoriteFoods : [],
+        dislikedFoods: Array.isArray(data.dislikedFoods) ? data.dislikedFoods : [],
+        mealsPerDay: Number(data.mealsPerDay) || 3,
+        calorieTarget: data.calorieTarget != null ? Number(data.calorieTarget) : undefined,
+        cookingSkill: data.cookingSkill || 'basic',
+        supplementGoal: data.supplementGoal || '',
+        currentSupplements: Array.isArray(data.currentSupplements) ? data.currentSupplements : [],
+        supplementBudget: data.supplementBudget || '',
+        healthConditions: Array.isArray(data.healthConditions) ? data.healthConditions : [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      saveProfile(profile);
+      setActiveProfile(profile.id);
+      setImportOk(true);
+      setImportJson('');
+      setTimeout(() => {
+        setImportOk(false);
+        setShowImport(false);
+      }, 1500);
+    } catch (e: any) {
+      setImportError('JSON نامعتبر است: ' + (e?.message || 'خطای پارس'));
+    }
+  };
+
   if (!showNewProfileForm) {
     return (
       <div className="space-y-6">
@@ -126,11 +229,41 @@ export default function Profile() {
             <User size={22} className={isDark ? 'text-[#d4af37]' : 'text-[#0d9488]'} />
             مدیریت پروفایل شاگردان
           </h2>
-          <button onClick={handleNewProfile} className={'flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-lg ' + (isDark ? 'bg-gradient-to-l from-[#d4af37] to-[#f0d060] text-[#0d0d1a] shadow-[#d4af37]/20 hover:opacity-90' : 'bg-gradient-to-l from-[#14b8a6] to-[#0d9488] text-white shadow-[#14b8a6]/20 hover:opacity-90')}>
-            <Plus size={16} />
-            پروفایل جدید
-          </button>
+          <div className="flex items-center gap-2">
+            {exportMsg && <span className={'text-xs ' + (isDark ? 'text-[#22c55e]' : 'text-[#059669]')}>{exportMsg}</span>}
+            <button onClick={() => { setShowImport(!showImport); setImportError(''); setImportOk(false); }} className={'flex items-center gap-2 px-3 py-2 rounded-xl font-bold text-sm transition-all border ' + (isDark ? 'border-[#d4af37]/40 text-[#d4af37] hover:bg-[#d4af37]/10' : 'border-[#14b8a6]/40 text-[#0d9488] hover:bg-[#f0fdfa]')}>
+              <Upload size={16} />
+              ورود JSON
+            </button>
+            <button onClick={handleNewProfile} className={'flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all shadow-lg ' + (isDark ? 'bg-gradient-to-l from-[#d4af37] to-[#f0d060] text-[#0d0d1a] shadow-[#d4af37]/20 hover:opacity-90' : 'bg-gradient-to-l from-[#14b8a6] to-[#0d9488] text-white shadow-[#14b8a6]/20 hover:opacity-90')}>
+              <Plus size={16} />
+              پروفایل جدید
+            </button>
+          </div>
         </div>
+        {showImport && (
+          <div className={'rounded-2xl p-5 border theme-transition ' + (isDark ? 'bg-[#1a1a2e] border-[#d4af37]/20' : 'bg-white border-[#14b8a6]/20')}>
+            <h3 className={'font-bold mb-2 text-sm ' + (isDark ? 'text-[#d4af37]' : 'text-[#0d9488]')}>ورود پروفایل از JSON</h3>
+            <p className={'text-xs mb-3 ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>خروجی JSON پروفایل را اینجا بچسبانید. یک پروفایل جدید ساخته می‌شود.</p>
+            <textarea
+              value={importJson}
+              onChange={e => setImportJson(e.target.value)}
+              rows={8}
+              placeholder='{"name":"...","age":25,"gender":"male",...}'
+              className={'w-full border rounded-xl px-4 py-3 text-xs font-mono focus:outline-none resize-none theme-transition ' + (isDark ? 'bg-[#0d0d1a] border-gray-700 text-white focus:border-[#d4af37]' : 'bg-[#f0fdfa] border-[#14b8a6]/30 text-[#134e4a] focus:border-[#14b8a6]')}
+              dir="ltr"
+            />
+            {importError && <p className="text-xs text-red-500 mt-2">{importError}</p>}
+            {importOk && <p className={'text-xs mt-2 ' + (isDark ? 'text-[#22c55e]' : 'text-[#059669]')}>پروفایل با موفقیت وارد شد</p>}
+            <div className="flex gap-2 mt-3">
+              <button onClick={handleImportProfile} className={'flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ' + (isDark ? 'bg-gradient-to-l from-[#d4af37] to-[#f0d060] text-[#0d0d1a]' : 'bg-gradient-to-l from-[#14b8a6] to-[#0d9488] text-white')}>
+                <Upload size={14} />
+                وارد کردن
+              </button>
+              <button onClick={() => { setShowImport(false); setImportJson(''); setImportError(''); }} className={'px-4 py-2 rounded-xl text-sm ' + (isDark ? 'text-gray-400 hover:text-white' : 'text-[#0f766e]/70 hover:text-[#0d9488]')}>انصراف</button>
+            </div>
+          </div>
+        )}
         {profiles.length === 0 ? (
           <div className={'rounded-2xl p-10 border text-center theme-transition ' + (isDark ? 'bg-[#1a1a2e] border-[#d4af37]/10' : 'bg-white border-[#14b8a6]/20')}>
             <div className={'w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center ' + (isDark ? 'bg-[#d4af37]/10' : 'bg-[#14b8a6]/10')}>
@@ -170,6 +303,8 @@ export default function Profile() {
                   {profile.id !== activeProfile?.id && (
                     <button onClick={() => setActiveProfile(profile.id)} className={'flex-1 py-2 rounded-lg text-xs font-bold transition-all ' + (isDark ? 'bg-[#4a90d9]/20 text-[#4a90d9] hover:bg-[#4a90d9]/30' : 'bg-[#14b8a6]/15 text-[#0d9488] hover:bg-[#14b8a6]/25')}>فعال‌سازی</button>
                   )}
+                  <button onClick={() => handleExportProfile(profile)} title="خروجی JSON" className={'flex items-center justify-center gap-1 px-2 py-2 rounded-lg text-xs font-bold transition-all ' + (isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-[#f0fdfa] text-[#0d9488] hover:bg-[#ccfbf1]')}><Download size={12} /></button>
+                  <button onClick={() => handleCopyProfile(profile)} title="کپی JSON" className={'flex items-center justify-center gap-1 px-2 py-2 rounded-lg text-xs font-bold transition-all ' + (isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-[#f0fdfa] text-[#0d9488] hover:bg-[#ccfbf1]')}><Copy size={12} /></button>
                   <button onClick={() => handleEditProfile(profile)} className={'flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-bold transition-all ' + (isDark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-[#f0fdfa] text-[#0d9488] hover:bg-[#ccfbf1]')}><Edit size={12} />ویرایش</button>
                   <button onClick={() => handleDeleteProfile(profile.id)} className={'flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-bold transition-all ' + (isDark ? 'bg-[#ef4444]/10 text-[#ef4444] hover:bg-[#ef4444]/20' : 'bg-red-50 text-red-700 hover:bg-red-100')}><Trash2 size={12} /></button>
                 </div>

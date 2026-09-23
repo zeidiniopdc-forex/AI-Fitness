@@ -104,10 +104,10 @@ export default function ProgramImport() {
 
   return (
     <div className="space-y-6">
-      <h2 className={`text-xl font-bold flex items-center gap-2 ${isDark ? 'text-white' : 'text-[#134e4a]'`}>
+      <h2 className={'text-xl font-bold flex items-center gap-2 ' + (isDark ? 'text-white' : 'text-[#134e4a]')}>
         <ImportIcon size={22} className={isDark ? 'text-[#22c55e]' : 'text-[#059669]'} />
         ورود برنامه تمرینی
-        <span className={`text-sm font-normal ${isDark ? 'text-gray-400' : 'text-[#0f766e]/70'`}>
+        <span className={'text-sm font-normal ' + (isDark ? 'text-gray-400' : 'text-[#0f766e]/70')}>
           — {activeProfile.name}
         </span>
       </h2>

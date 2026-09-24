@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -16,17 +16,10 @@ import WorkoutTracker from './pages/WorkoutTracker';
 import CalendarPage from './pages/Calendar';
 import Progress from './pages/Progress';
 
-const WELCOME_KEY = 'coachino_welcome_seen_v1';
-
 function App() {
-  const [showWelcome, setShowWelcome] = useState(false);
-
-  useEffect(() => {
-    setShowWelcome(localStorage.getItem(WELCOME_KEY) !== 'true');
-  }, []);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   const continueToApp = () => {
-    localStorage.setItem(WELCOME_KEY, 'true');
     setShowWelcome(false);
   };
 
